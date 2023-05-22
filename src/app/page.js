@@ -15,7 +15,7 @@ export default function Home() {
       state: LOBBY_STATE,
       question: null,
     });
-    router.push(`/join/${gamesRef.id}`);
+    router.push(`/join/${gamesRef.id}?isHost=true`);
   }
 
   function joinGame() {

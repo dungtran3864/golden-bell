@@ -8,8 +8,8 @@ export default function GamePinScreen() {
   const router = useRouter();
 
   function joinRoom(e) {
-      e.preventDefault();
-    router.push(`/join/${pin}`);
+    e.preventDefault();
+    router.push(`/join/${pin}?isHost=false`);
   }
 
   return (
