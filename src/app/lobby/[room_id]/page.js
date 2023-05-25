@@ -1,10 +1,6 @@
 "use client";
 
 import {
-  collection,
-  query,
-  where,
-  onSnapshot,
   doc,
   getDoc,
   updateDoc,
@@ -14,13 +10,16 @@ import { useEffect, useState } from "react";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import { useRouter } from "next/navigation";
 import { GAMEBLOCK_STATE } from "@/constants";
+import useParticipation from "@/hooks/useParticipation";
+import useGameState from "@/hooks/useGameState";
 
 export default function LobbyPage({ params }) {
   const roomId = params.room_id;
-  const [participants, setParticipants] = useState(0);
-  const [user, setUser] = useSessionStorage("user");
+  const [user] = useSessionStorage("user");
   const router = useRouter();
   const [isHost, setHost] = useState(false);
+  const [participants] = useParticipation(roomId);
+  const [gameState] = useGameState(roomId);
 
   useEffect(() => {
     async function validateUser() {
@@ -43,30 +42,11 @@ export default function LobbyPage({ params }) {
     validateUser();
   }, []);
 
-  const participationQuery = query(
-    collection(firebaseDB, "users"),
-    where("roomId", "==", roomId)
-  );
-  const participationUnsubscribe = onSnapshot(
-    participationQuery,
-    (querySnapshot) => {
-      let count = 0;
-      querySnapshot.forEach((doc) => {
-        count++;
-      });
-      setParticipants(count);
+  useEffect(() => {
+    if (gameState === GAMEBLOCK_STATE) {
+      router.push(`/gameblock/${roomId}`);
     }
-  );
-
-  const gameUnsubscribe = onSnapshot(
-    doc(firebaseDB, "games", roomId),
-    (doc) => {
-      const game = doc.data();
-      if (game.state === GAMEBLOCK_STATE) {
-        router.push(`/gameblock/${roomId}`);
-      }
-    }
-  );
+  }, [gameState]);
 
   async function startGame(e) {
     e.preventDefault();
