@@ -5,23 +5,26 @@ import firebaseDB from "@/firebase/initFirebase";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { convertStringToBoolean } from "@/utils";
+import useSessionStorage from "@/hooks/useSessionStorage";
 
 export default function JoinPage({ params }) {
   const roomId = params.room_id;
   const [name, setName] = useState(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [user, setUser] = useSessionStorage("user");
 
   async function addUser(e) {
     e.preventDefault();
     const isHost = convertStringToBoolean(searchParams.get("isHost"));
-    await addDoc(collection(firebaseDB, "users"), {
+    const userRef = await addDoc(collection(firebaseDB, "users"), {
       name: name,
       roomId: roomId,
       answer: null,
       eliminated: false,
       isHost: isHost,
     });
+    setUser(userRef.id);
     router.push(`/lobby/${roomId}`);
   }
 
