@@ -17,7 +17,7 @@ export default function LobbyPage({ params }) {
   const roomId = params.room_id;
   const [user] = useSessionStorage("user");
   const router = useRouter();
-  const [isHost, setHost] = useSessionStorage("isHost");
+  const [isHost] = useSessionStorage("isHost");
   const [participants] = useParticipation(roomId);
   const [gameState] = useGameState(roomId);
 
