@@ -13,6 +13,7 @@ export default function JoinPage({ params }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [user, setUser] = useSessionStorage("user");
+  const [isHost, setHost] =  useSessionStorage("isHost");
 
   async function addUser(e) {
     e.preventDefault();
@@ -25,6 +26,7 @@ export default function JoinPage({ params }) {
       isHost: isHost,
     });
     setUser(userRef.id);
+    setHost(isHost);
     router.push(`/lobby/${roomId}`);
   }
 

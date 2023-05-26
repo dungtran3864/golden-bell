@@ -17,7 +17,7 @@ export default function LobbyPage({ params }) {
   const roomId = params.room_id;
   const [user] = useSessionStorage("user");
   const router = useRouter();
-  const [isHost, setHost] = useState(false);
+  const [isHost, setHost] = useSessionStorage("isHost");
   const [participants] = useParticipation(roomId);
   const [gameState] = useGameState(roomId);
 
@@ -33,10 +33,6 @@ export default function LobbyPage({ params }) {
         router.push("/");
         return () => {};
       }
-
-      const userRef = doc(firebaseDB, "users", user);
-      const userSnap = await getDoc(userRef);
-      setHost(userSnap.data().isHost);
     }
 
     validateUser();
