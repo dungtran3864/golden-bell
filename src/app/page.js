@@ -1,19 +1,28 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
 import firebaseDB from "@/firebase/initFirebase";
 import { LOBBY_STATE } from "@/constants";
+import { shuffle } from "@/utils";
 
 export default function Home() {
   const router = useRouter();
 
   async function createNewGame() {
+    const questionQuery = query(collection(firebaseDB, "questions"));
+    const querySnapshot = await getDocs(questionQuery);
+    const questions = [];
+    querySnapshot.forEach((doc) => {
+      questions.push(doc.data());
+    });
+    const shuffledQuestions = shuffle(questions);
     const gamesRef = await addDoc(collection(firebaseDB, "games"), {
-      users: [],
       seconds: 15,
       state: LOBBY_STATE,
-      question: null,
+      currQuestion: null,
+      currQuestionIdx: -1,
+      questions: shuffledQuestions,
     });
     router.push(`/join/${gamesRef.id}?isHost=true`);
   }

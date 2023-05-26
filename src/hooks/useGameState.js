@@ -1,6 +1,5 @@
 import { doc, onSnapshot } from "firebase/firestore";
 import firebaseDB from "@/firebase/initFirebase";
-import { GAMEBLOCK_STATE } from "@/constants";
 import { useState } from "react";
 
 export default function useGameState(roomId) {
