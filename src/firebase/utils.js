@@ -6,6 +6,7 @@ import {
   query,
   getDocs,
   addDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import firebaseDB from "@/firebase/initFirebase";
 
@@ -41,6 +42,31 @@ export async function getMultipleDocuments(path, ...queryConstraints) {
 
 export async function addSingleDocument(path, requestBody) {
   const docRef = await addDoc(collection(firebaseDB, path), requestBody);
-  console.log(docRef);
   return docRef.id;
+}
+
+export function onListenSingleDocumentRealTime(path, pathSegments, callback) {
+  const unsub = onSnapshot(doc(firebaseDB, path, pathSegments), (doc) => {
+    if (doc.exists()) {
+      callback(doc.data());
+    }
+  });
+}
+
+export function onListenMultipleDocumentsRealTime(
+  path,
+  callback,
+  ...queryConstraints
+) {
+  const q = query(collection(firebaseDB, path), ...queryConstraints);
+  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+    let count = 0;
+    const results = [];
+    querySnapshot.forEach((doc) => {
+      count++;
+      results.push(doc.data());
+    });
+    console.log(count);
+    callback(count, results);
+  });
 }

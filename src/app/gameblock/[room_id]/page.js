@@ -1,39 +1,28 @@
 "use client";
 import useQuestion from "@/hooks/useQuestion";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { checkAnswer } from "@/utils";
-import { collection, onSnapshot, query, where } from "firebase/firestore";
-import firebaseDB from "@/firebase/initFirebase";
+import { where } from "firebase/firestore";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import { useRouter } from "next/navigation";
 import { GAMES_PATH, RESULT_STATE, USERS_PATH } from "@/constants";
-import { getSingleDocument, updateSingleDocument } from "@/firebase/utils";
-import {validateUser} from "@/utils/authentication";
+import {
+  getMultipleDocuments,
+  getSingleDocument,
+  updateSingleDocument,
+} from "@/firebase/utils";
+import { validateUser } from "@/utils/authentication";
 
 export default function Gameblock({ params }) {
   const roomId = params.room_id;
   const [currQuestion] = useQuestion(roomId);
   const [user] = useSessionStorage("user");
   const [answer, setAnswer] = useState(null);
-  const [completedPlayers, setCompletedPlayers] = useState(0);
   const router = useRouter();
 
   useEffect(() => {
     validateUser(roomId, user, router);
-  }, [])
-
-  const playersQuery = query(
-    collection(firebaseDB, "users"),
-    where("roomId", "==", roomId),
-    where("answerSubmitted", "==", true)
-  );
-  const unsubscribe = onSnapshot(playersQuery, (querySnapshot) => {
-    let playersDone = 1;
-    querySnapshot.forEach((doc) => {
-      playersDone++;
-    });
-    setCompletedPlayers(playersDone);
-  });
+  }, []);
 
   async function submitAnswer(e) {
     e.preventDefault();
@@ -44,6 +33,11 @@ export default function Gameblock({ params }) {
     });
     const gameData = await getSingleDocument(GAMES_PATH, roomId);
     const numberOfPlayers = gameData.numberOfPlayers;
+    const [completedPlayers] = await getMultipleDocuments(
+      USERS_PATH,
+      where("roomId", "==", roomId),
+      where("answerSubmitted", "==", true)
+    );
     if (completedPlayers === numberOfPlayers) {
       const gameState = gameData.state;
       if (gameState !== RESULT_STATE) {
