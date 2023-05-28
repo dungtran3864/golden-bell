@@ -1,20 +1,21 @@
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import firebaseDB from "@/firebase/initFirebase";
+import { getSingleDocument, updateSingleDocument } from "@/firebase/utils";
+import { GAMES_PATH } from "@/constants";
 
 export default function useQuestion(roomId) {
   const [question, setQuestion] = useState(null);
 
   useEffect(() => {
     async function fetchQuestion() {
-      const gameRef = doc(firebaseDB, "games", roomId);
-      const gameSnap = await getDoc(gameRef);
-      let currQuestion = gameSnap.data().currQuestion;
+      const gameData = await getSingleDocument(GAMES_PATH, roomId);
+      let currQuestion = gameData.currQuestion;
       if (!currQuestion) {
-        const questions = gameSnap.data().questions;
-        const currQuestionIdx = gameSnap.data().currQuestionIdx + 1;
+        const questions = gameData.questions;
+        const currQuestionIdx = gameData.currQuestionIdx + 1;
         currQuestion = questions[currQuestionIdx];
-        await updateDoc(gameRef, {
+        await updateSingleDocument(GAMES_PATH, roomId, {
           currQuestionIdx,
           currQuestion,
         });

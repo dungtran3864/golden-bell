@@ -1,17 +1,12 @@
 "use client";
-
-import {
-  doc,
-  getDoc,
-  updateDoc,
-} from "firebase/firestore";
-import firebaseDB from "@/firebase/initFirebase";
 import { useEffect } from "react";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import { useRouter } from "next/navigation";
-import { GAMEBLOCK_STATE } from "@/constants";
+import { GAMEBLOCK_STATE, GAMES_PATH } from "@/constants";
 import useParticipation from "@/hooks/useParticipation";
 import useGameState from "@/hooks/useGameState";
+import { updateSingleDocument } from "@/firebase/utils";
+import { validateUser } from "@/utils/authentication";
 
 export default function LobbyPage({ params }) {
   const roomId = params.room_id;
@@ -22,20 +17,7 @@ export default function LobbyPage({ params }) {
   const [gameState] = useGameState(roomId);
 
   useEffect(() => {
-    async function validateUser() {
-      const roomRef = doc(firebaseDB, "games", roomId);
-      const roomSnap = await getDoc(roomRef);
-      if (!roomSnap.exists()) {
-        router.push("/");
-        return () => {};
-      }
-      if (user == null) {
-        router.push("/");
-        return () => {};
-      }
-    }
-
-    validateUser();
+    validateUser(roomId, user, router);
   }, []);
 
   useEffect(() => {
@@ -46,8 +28,7 @@ export default function LobbyPage({ params }) {
 
   async function startGame(e) {
     e.preventDefault();
-    const roomRef = doc(firebaseDB, "games", roomId);
-    await updateDoc(roomRef, {
+    await updateSingleDocument(GAMES_PATH, roomId, {
       state: GAMEBLOCK_STATE,
       numberOfPlayers: participants,
     });

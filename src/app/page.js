@@ -1,29 +1,23 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { collection, addDoc, query, where, getDocs } from "firebase/firestore";
-import firebaseDB from "@/firebase/initFirebase";
-import { LOBBY_STATE } from "@/constants";
+import { GAMES_PATH, LOBBY_STATE, QUESTIONS_PATH } from "@/constants";
 import { shuffle } from "@/utils";
+import { addSingleDocument, getMultipleDocuments } from "@/firebase/utils";
 
 export default function Home() {
   const router = useRouter();
 
   async function createNewGame() {
-    const questionQuery = query(collection(firebaseDB, "questions"));
-    const querySnapshot = await getDocs(questionQuery);
-    const questions = [];
-    querySnapshot.forEach((doc) => {
-      questions.push(doc.data());
-    });
+    const [count, questions] = await getMultipleDocuments(QUESTIONS_PATH);
     const shuffledQuestions = shuffle(questions);
-    const gamesRef = await addDoc(collection(firebaseDB, "games"), {
+    const roomId = await addSingleDocument(GAMES_PATH, {
       state: LOBBY_STATE,
       currQuestion: null,
       currQuestionIdx: -1,
       questions: shuffledQuestions,
     });
-    router.push(`/join/${gamesRef.id}?isHost=true`);
+    router.push(`/join/${roomId}?isHost=true`);
   }
 
   function joinGame() {

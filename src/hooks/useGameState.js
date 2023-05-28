@@ -8,8 +8,10 @@ export default function useGameState(roomId) {
   const gameUnsubscribe = onSnapshot(
     doc(firebaseDB, "games", roomId),
     (doc) => {
-      const game = doc.data();
-      setGameState(game.state);
+      if (doc.exists()) {
+        const game = doc.data();
+        setGameState(game.state);
+      }
     }
   );
 

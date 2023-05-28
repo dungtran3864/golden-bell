@@ -1,20 +1,14 @@
 "use client";
 import useQuestion from "@/hooks/useQuestion";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { checkAnswer } from "@/utils";
-import {
-  collection,
-  doc,
-  onSnapshot,
-  query,
-  updateDoc,
-  where,
-  getDoc,
-} from "firebase/firestore";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
 import firebaseDB from "@/firebase/initFirebase";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import { useRouter } from "next/navigation";
-import { RESULT_STATE } from "@/constants";
+import { GAMES_PATH, RESULT_STATE, USERS_PATH } from "@/constants";
+import { getSingleDocument, updateSingleDocument } from "@/firebase/utils";
+import {validateUser} from "@/utils/authentication";
 
 export default function Gameblock({ params }) {
   const roomId = params.room_id;
@@ -23,6 +17,10 @@ export default function Gameblock({ params }) {
   const [answer, setAnswer] = useState(null);
   const [completedPlayers, setCompletedPlayers] = useState(0);
   const router = useRouter();
+
+  useEffect(() => {
+    validateUser(roomId, user, router);
+  }, [])
 
   const playersQuery = query(
     collection(firebaseDB, "users"),
@@ -40,18 +38,16 @@ export default function Gameblock({ params }) {
   async function submitAnswer(e) {
     e.preventDefault();
     const isCorrect = checkAnswer(answer, currQuestion.answer);
-    const userRef = doc(firebaseDB, "users", user);
-    await updateDoc(userRef, {
+    await updateSingleDocument(USERS_PATH, user, {
       answerSubmitted: true,
       eliminated: !isCorrect,
     });
-    const gameRef = doc(firebaseDB, "games", roomId);
-    const gameSnap = await getDoc(gameRef);
-    const numberOfPlayers = gameSnap.data().numberOfPlayers;
+    const gameData = await getSingleDocument(GAMES_PATH, roomId);
+    const numberOfPlayers = gameData.numberOfPlayers;
     if (completedPlayers === numberOfPlayers) {
-      const gameState = gameSnap.data().state;
+      const gameState = gameData.state;
       if (gameState !== RESULT_STATE) {
-        await updateDoc(gameRef, {
+        await updateSingleDocument(GAMES_PATH, roomId, {
           state: RESULT_STATE,
         });
       }
