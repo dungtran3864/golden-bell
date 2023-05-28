@@ -6,7 +6,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import firebaseDB from "@/firebase/initFirebase";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import { useRouter } from "next/navigation";
 import { GAMEBLOCK_STATE } from "@/constants";
@@ -49,6 +49,7 @@ export default function LobbyPage({ params }) {
     const roomRef = doc(firebaseDB, "games", roomId);
     await updateDoc(roomRef, {
       state: GAMEBLOCK_STATE,
+      numberOfPlayers: participants,
     });
     router.push(`/gameblock/${roomId}`);
   }

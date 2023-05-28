@@ -29,3 +29,19 @@ export function shuffle(array) {
 
   return array;
 }
+
+export function checkAnswer(toBeCompared, target) {
+  if (toBeCompared === null && target === null) {
+    return true;
+  }
+  if (toBeCompared === null && target !== null) {
+    return false;
+  }
+  if (toBeCompared !== null && target === null) {
+    return false;
+  }
+  return toBeCompared
+    .trim()
+    .toLowerCase()
+    .includes(target.trim().toLowerCase());
+}

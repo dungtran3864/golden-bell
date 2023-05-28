@@ -18,7 +18,6 @@ export default function Home() {
     });
     const shuffledQuestions = shuffle(questions);
     const gamesRef = await addDoc(collection(firebaseDB, "games"), {
-      seconds: 15,
       state: LOBBY_STATE,
       currQuestion: null,
       currQuestionIdx: -1,

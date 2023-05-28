@@ -21,7 +21,7 @@ export default function JoinPage({ params }) {
     const userRef = await addDoc(collection(firebaseDB, "users"), {
       name: name,
       roomId: roomId,
-      answer: null,
+      answerSubmitted: false,
       eliminated: false,
     });
     setUser(userRef.id);
