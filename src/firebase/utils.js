@@ -66,7 +66,6 @@ export function onListenMultipleDocumentsRealTime(
       count++;
       results.push(doc.data());
     });
-    console.log(count);
     callback(count, results);
   });
 }
