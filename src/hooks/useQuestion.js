@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
-import firebaseDB from "@/firebase/initFirebase";
 import { getSingleDocument, updateSingleDocument } from "@/firebase/utils";
 import { GAMES_PATH } from "@/constants";
 
