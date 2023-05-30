@@ -49,19 +49,21 @@ export default function Gameblock({ params }) {
       eliminated: true,
     });
     const gameData = await getSingleDocument(GAMES_PATH, roomId);
-    const numberOfPlayers = gameData.numberOfPlayers;
-    const [completedPlayers] = await getMultipleDocuments(
-      USERS_PATH,
-      where("roomId", "==", roomId),
-      where("answerSubmitted", "==", true),
-      where("active", "==", true)
-    );
-    if (completedPlayers === numberOfPlayers) {
-      const gameState = gameData.state;
-      if (gameState !== RESULT_STATE) {
-        await updateSingleDocument(GAMES_PATH, roomId, {
-          state: RESULT_STATE,
-        });
+    if (gameData) {
+      const numberOfPlayers = gameData.numberOfPlayers;
+      const [completedPlayers] = await getMultipleDocuments(
+          USERS_PATH,
+          where("roomId", "==", roomId),
+          where("answerSubmitted", "==", true),
+          where("active", "==", true)
+      );
+      if (completedPlayers === numberOfPlayers) {
+        const gameState = gameData.state;
+        if (gameState !== RESULT_STATE) {
+          await updateSingleDocument(GAMES_PATH, roomId, {
+            state: RESULT_STATE,
+          });
+        }
       }
     }
   }
@@ -75,23 +77,25 @@ export default function Gameblock({ params }) {
       eliminated: !isCorrect,
     });
     const gameData = await getSingleDocument(GAMES_PATH, roomId);
-    const numberOfPlayers = gameData.numberOfPlayers;
-    const [completedPlayers] = await getMultipleDocuments(
-      USERS_PATH,
-      where("roomId", "==", roomId),
-      where("answerSubmitted", "==", true),
-      where("active", "==", true)
-    );
-    if (completedPlayers === numberOfPlayers) {
-      const gameState = gameData.state;
-      if (gameState !== RESULT_STATE) {
-        await updateSingleDocument(GAMES_PATH, roomId, {
-          state: RESULT_STATE,
-        });
+    if (gameData) {
+      const numberOfPlayers = gameData.numberOfPlayers;
+      const [completedPlayers] = await getMultipleDocuments(
+          USERS_PATH,
+          where("roomId", "==", roomId),
+          where("answerSubmitted", "==", true),
+          where("active", "==", true)
+      );
+      if (completedPlayers === numberOfPlayers) {
+        const gameState = gameData.state;
+        if (gameState !== RESULT_STATE) {
+          await updateSingleDocument(GAMES_PATH, roomId, {
+            state: RESULT_STATE,
+          });
+        }
+        router.push(`/gameblock/result/${roomId}`);
+      } else {
+        router.push(`/gameblock/wait/${roomId}`);
       }
-      router.push(`/gameblock/result/${roomId}`);
-    } else {
-      router.push(`/gameblock/wait/${roomId}`);
     }
   }
 
