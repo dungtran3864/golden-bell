@@ -53,7 +53,8 @@ export default function Gameblock({ params }) {
     const [completedPlayers] = await getMultipleDocuments(
       USERS_PATH,
       where("roomId", "==", roomId),
-      where("answerSubmitted", "==", true)
+      where("answerSubmitted", "==", true),
+      where("active", "==", true)
     );
     if (completedPlayers === numberOfPlayers) {
       const gameState = gameData.state;
@@ -78,7 +79,8 @@ export default function Gameblock({ params }) {
     const [completedPlayers] = await getMultipleDocuments(
       USERS_PATH,
       where("roomId", "==", roomId),
-      where("answerSubmitted", "==", true)
+      where("answerSubmitted", "==", true),
+      where("active", "==", true)
     );
     if (completedPlayers === numberOfPlayers) {
       const gameState = gameData.state;

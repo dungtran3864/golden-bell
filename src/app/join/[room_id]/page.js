@@ -22,6 +22,7 @@ export default function JoinPage({ params }) {
       roomId: roomId,
       answerSubmitted: false,
       eliminated: false,
+      active: true,
     });
     setUser(userId);
     setHost(isHost);

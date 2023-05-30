@@ -1,25 +1,26 @@
 "use client";
-import { GAMES_PATH, RESULT_STATE, USER_STORAGE_KEY } from "@/constants";
+import { RESULT_STATE, USER_STORAGE_KEY } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { validateUser } from "@/utils/authentication";
 import useSessionStorage from "@/hooks/useSessionStorage";
-import { onListenSingleDocumentRealTime } from "@/firebase/utils";
+import useGameState from "@/hooks/useGameState";
 
 export default function WaitingPage({ params }) {
   const [user] = useSessionStorage(USER_STORAGE_KEY);
   const roomId = params.room_id;
   const router = useRouter();
+  const [gameState] = useGameState(roomId);
 
   useEffect(() => {
     validateUser(roomId, user, router);
   }, []);
 
-  onListenSingleDocumentRealTime(GAMES_PATH, roomId, (gameData) => {
-    if (gameData.state === RESULT_STATE) {
+  useEffect(() => {
+    if (gameState === RESULT_STATE) {
       router.push(`/gameblock/result/${roomId}`);
     }
-  });
+  }, [gameState]);
 
   return (
     <div>
