@@ -31,7 +31,6 @@ export default function ResultPage({ params }) {
   useEffect(() => {
     validateUser(roomId, user, router);
     getCurrPlayerEliminationStatus();
-    // getNumberOfPlayersEliminated();
   }, []);
 
   useEffect(() => {
