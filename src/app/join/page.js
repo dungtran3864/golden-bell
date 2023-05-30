@@ -13,12 +13,16 @@ export default function GamePinScreen() {
   async function joinRoom(e) {
     e.preventDefault();
     const gameData = await getSingleDocument(GAMES_PATH, pin.trim());
-    if (gameData.state === LOBBY_STATE) {
-      router.push(`/join/${pin}?isHost=false`);
+    if (gameData) {
+      if (gameData.state === LOBBY_STATE) {
+        router.push(`/join/${pin}?isHost=false`);
+      } else {
+        setErrorMessage(
+          "This game has already started. Please join another game."
+        );
+      }
     } else {
-      setErrorMessage(
-        "This game has already started. Please join another game."
-      );
+      setErrorMessage("This game doesn't exist. Please join another game.");
     }
   }
 

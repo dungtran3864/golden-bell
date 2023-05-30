@@ -11,10 +11,7 @@ import {
 } from "@/constants";
 import { useRouter } from "next/navigation";
 import useQuestion from "@/hooks/useQuestion";
-import {
-  getSingleDocument,
-  updateSingleDocument,
-} from "@/firebase/utils";
+import { getSingleDocument, updateSingleDocument } from "@/firebase/utils";
 import useGameState from "@/hooks/useGameState";
 import useParticipation from "@/hooks/useParticipation";
 
@@ -73,10 +70,21 @@ export default function ResultPage({ params }) {
     await navigateToNextRound();
   }
 
+  function getEliminationMessage(status) {
+    switch (status) {
+      case true:
+        return "ELIMINATED";
+      case false:
+        return "A SURVIVOR";
+      default:
+        return null;
+    }
+  }
+
   return (
     <div>
       <h1>Summary of this round</h1>
-      <strong>You are {eliminationStatus ? "ELIMINATED" : "A SURVIVOR"}</strong>
+      <strong>You are {getEliminationMessage(eliminationStatus)}</strong>
       <p>Question: {currQuestion?.question}</p>
       <p>
         Answer: <strong>{currQuestion?.answer}</strong>
