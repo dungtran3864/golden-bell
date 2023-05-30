@@ -12,12 +12,11 @@ import {
 import { useRouter } from "next/navigation";
 import useQuestion from "@/hooks/useQuestion";
 import {
-  getMultipleDocuments,
   getSingleDocument,
   updateSingleDocument,
 } from "@/firebase/utils";
 import useGameState from "@/hooks/useGameState";
-import { where } from "firebase/firestore";
+import useParticipation from "@/hooks/useParticipation";
 
 export default function ResultPage({ params }) {
   const roomId = params.room_id;
@@ -26,14 +25,13 @@ export default function ResultPage({ params }) {
   const [currQuestion, resetRound] = useQuestion(roomId);
   const [gameState] = useGameState(roomId);
   const [eliminationStatus, setEliminationStatus] = useState(null);
-  const [numOfEliminated, setNumOfEliminated] = useState(null);
-  const [survived, setSurvived] = useState(null);
+  const [participants, survived, eliminated] = useParticipation(roomId);
   const router = useRouter();
 
   useEffect(() => {
     validateUser(roomId, user, router);
     getCurrPlayerEliminationStatus();
-    getNumberOfPlayersEliminated();
+    // getNumberOfPlayersEliminated();
   }, []);
 
   useEffect(() => {
@@ -50,20 +48,6 @@ export default function ResultPage({ params }) {
     const currUser = await getSingleDocument(USERS_PATH, user);
     if (currUser) {
       setEliminationStatus(currUser.eliminated);
-    }
-  }
-
-  async function getNumberOfPlayersEliminated() {
-    const currGame = await getSingleDocument(GAMES_PATH, roomId);
-    const [numOfSurvived] = await getMultipleDocuments(
-      USERS_PATH,
-      where("roomId", "==", roomId),
-      where("eliminated", "==", false),
-      where("active", "==", true)
-    );
-    if (currGame) {
-      setSurvived(numOfSurvived);
-      setNumOfEliminated(currGame.numberOfPlayers - numOfSurvived);
     }
   }
 
@@ -102,7 +86,7 @@ export default function ResultPage({ params }) {
         Number of players survived: <strong>{survived}</strong>
       </p>
       <p>
-        Number of players eliminated: <strong>{numOfEliminated}</strong>
+        Number of players eliminated: <strong>{eliminated}</strong>
       </p>
       {isHost && (
         <button type={"button"} onClick={proceed}>
