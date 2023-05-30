@@ -99,10 +99,10 @@ export default function ResultPage({ params }) {
         Answer: <strong>{currQuestion?.answer}</strong>
       </p>
       <p>
-        Number of players eliminated: <strong>{numOfEliminated}</strong>
+        Number of players survived: <strong>{survived}</strong>
       </p>
       <p>
-        Number of players survived: <strong>{survived}</strong>
+        Number of players eliminated: <strong>{numOfEliminated}</strong>
       </p>
       {isHost && (
         <button type={"button"} onClick={proceed}>
