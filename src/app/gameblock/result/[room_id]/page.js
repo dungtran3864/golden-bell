@@ -7,7 +7,7 @@ import {
   GAMES_PATH,
   HOST_STORAGE_KEY,
   USER_STORAGE_KEY,
-  USERS_PATH,
+  USERS_PATH, WINNER_STATE,
 } from "@/constants";
 import { useRouter } from "next/navigation";
 import useQuestion from "@/hooks/useQuestion";
@@ -19,7 +19,7 @@ export default function ResultPage({ params }) {
   const roomId = params.room_id;
   const [user] = useSessionStorage(USER_STORAGE_KEY);
   const [isHost] = useSessionStorage(HOST_STORAGE_KEY);
-  const [currQuestion, resetRound] = useQuestion(roomId);
+  const [currQuestion, resetRound, isLastQuestion] = useQuestion(roomId);
   const [gameState] = useGameState(roomId);
   const [eliminationStatus, setEliminationStatus] = useState(null);
   const [participants, survived, eliminated] = useParticipation(roomId);
@@ -37,6 +37,8 @@ export default function ResultPage({ params }) {
       } else {
         crossEliminated();
       }
+    } else if (gameState === WINNER_STATE) {
+      navigateToChampionScreen();
     }
   }, [gameState]);
 
@@ -54,6 +56,10 @@ export default function ResultPage({ params }) {
     router.push(`/gameblock/${roomId}`);
   }
 
+  async function navigateToChampionScreen() {
+    router.push(`/gameblock/winner/${roomId}`);
+  }
+
   async function crossEliminated() {
     await updateSingleDocument(USERS_PATH, user, {
       active: false,
@@ -62,12 +68,20 @@ export default function ResultPage({ params }) {
   }
 
   async function proceed() {
-    await resetRound();
-    await updateSingleDocument(GAMES_PATH, roomId, {
-      state: GAMEBLOCK_STATE,
-      numberOfPlayers: survived,
-    });
-    await navigateToNextRound();
+    if (survived > 1 && !isLastQuestion) {
+      await resetRound();
+      await updateSingleDocument(GAMES_PATH, roomId, {
+        state: GAMEBLOCK_STATE,
+        numberOfPlayers: survived,
+      });
+      await navigateToNextRound();
+    } else {
+      await updateSingleDocument(GAMES_PATH, roomId, {
+        state: WINNER_STATE,
+        numberOfPlayers: survived,
+      });
+      navigateToChampionScreen();
+    }
   }
 
   function getEliminationMessage(status) {
