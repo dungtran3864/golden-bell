@@ -34,7 +34,7 @@ export async function getMultipleDocuments(path, ...queryConstraints) {
   const querySnapshot = await getDocs(q);
   querySnapshot.forEach((doc) => {
     count++;
-    results.push(doc.data());
+    results.push({ uid: doc.id, ...doc.data() });
   });
 
   return [count, results];
