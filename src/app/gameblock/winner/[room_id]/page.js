@@ -45,19 +45,19 @@ export default function WinnerPage({ params }) {
   }
 
   function showHeader() {
-    // Case: no one wins
+    // Case: no one wins the game
     if (count === 0) {
       return <h1>Game over!</h1>;
     }
-    // Case: I am NOT the winner
+    // Case: you are NOT the winner
     if (count === 1 && user !== winners[0].uid) {
       return consolidationMessage();
     }
-    // Case: sole winner is me
+    // Case: you are the winner
     if (count === 1 && user === winners[0]?.uid) {
       return winningMessage(winners[0]?.name);
     }
-    // Case: multiple winners, check if I am in there or not
+    // Case: multiple winners, check if you are a winner or not
     if (count > 1) {
       for (let winner of winners) {
         if (winner.uid === user) {
@@ -99,6 +99,7 @@ export default function WinnerPage({ params }) {
         </div>
       );
     }
+    return null;
   }
 
   return (
