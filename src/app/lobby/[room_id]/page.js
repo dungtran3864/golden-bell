@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import { useRouter } from "next/navigation";
 import { GAMEBLOCK_STATE, GAMES_PATH } from "@/constants";
@@ -15,6 +15,7 @@ export default function LobbyPage({ params }) {
   const [isHost] = useSessionStorage("isHost");
   const [participants] = useParticipation(roomId);
   const [gameState] = useGameState(roomId);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     validateUser(roomId, user, router);
@@ -28,11 +29,17 @@ export default function LobbyPage({ params }) {
 
   async function startGame(e) {
     e.preventDefault();
-    await updateSingleDocument(GAMES_PATH, roomId, {
-      state: GAMEBLOCK_STATE,
-      numberOfPlayers: participants,
-    });
-    router.push(`/gameblock/${roomId}`);
+    if (participants > 1) {
+      await updateSingleDocument(GAMES_PATH, roomId, {
+        state: GAMEBLOCK_STATE,
+        numberOfPlayers: participants,
+      });
+      router.push(`/gameblock/${roomId}`);
+    } else {
+      setErrorMessage(
+        "The game needs to have at least 2 players. Please invite more people to join."
+      );
+    }
   }
 
   return (
@@ -43,6 +50,7 @@ export default function LobbyPage({ params }) {
         Share this room id to your friends to join: <strong>{roomId}</strong>
       </p>
       {isHost && <button type={"submit"}>Start game</button>}
+      <p>{errorMessage}</p>
     </form>
   );
 }
