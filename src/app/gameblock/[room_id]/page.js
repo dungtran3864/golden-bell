@@ -2,16 +2,15 @@
 import useQuestion from "@/hooks/useQuestion";
 import { useEffect, useState } from "react";
 import { checkAnswer } from "@/utils";
-import { where } from "firebase/firestore";
+import { runTransaction, doc } from "firebase/firestore";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import { useRouter } from "next/navigation";
 import { GAMES_PATH, RESULT_STATE, USERS_PATH } from "@/constants";
 import {
-  getMultipleDocuments,
-  getSingleDocument,
   updateSingleDocument,
 } from "@/firebase/utils";
 import { validateUser } from "@/utils/authentication";
+import firebaseDB from "@/firebase/initFirebase";
 
 let countdown;
 let countdownTracker;
@@ -28,8 +27,6 @@ export default function Gameblock({ params }) {
     validateUser(roomId, user, router);
     startCountdown();
   }, []);
-
-  console.log('test');
 
   function startCountdown() {
     countdown = timer;
@@ -50,23 +47,70 @@ export default function Gameblock({ params }) {
       answerSubmitted: true,
       eliminated: true,
     });
-    const gameData = await getSingleDocument(GAMES_PATH, roomId);
-    if (gameData) {
-      const numberOfPlayers = gameData.numberOfPlayers;
-      const [completedPlayers] = await getMultipleDocuments(
-          USERS_PATH,
-          where("roomId", "==", roomId),
-          where("answerSubmitted", "==", true),
-          where("active", "==", true)
-      );
-      if (completedPlayers === numberOfPlayers) {
-        const gameState = gameData.state;
-        if (gameState !== RESULT_STATE) {
-          await updateSingleDocument(GAMES_PATH, roomId, {
-            state: RESULT_STATE,
+    await updateTotalSubmittedAnswers(false);
+    await updateGameTransition();
+  }
+
+  async function updateTotalSubmittedAnswers(isCorrect) {
+    const gameRef = doc(firebaseDB, GAMES_PATH, roomId);
+
+    try {
+      await runTransaction(firebaseDB, async (transaction) => {
+        const gameDoc = await transaction.get(gameRef);
+        if (!gameDoc.exists()) {
+          throw "Game does not exist.";
+        }
+
+        if (isCorrect) {
+          const updatedSubmitted = gameDoc.data().numberOfSubmitted + 1;
+          transaction.update(gameRef, { numberOfSubmitted: updatedSubmitted });
+        } else {
+          const updatedSubmitted = gameDoc.data().numberOfSubmitted + 1;
+          const updatedEliminated = gameDoc.data().numberOfEliminated + 1;
+          transaction.update(gameRef, {
+            numberOfSubmitted: updatedSubmitted,
+            numberOfEliminated: updatedEliminated,
           });
         }
-      }
+      });
+    } catch (e) {
+      console.log("Transaction failed: ", e);
+    }
+  }
+
+  async function updateGameTransition(
+    incompleteGameCallback,
+    completeGameCallback
+  ) {
+    const gameRef = doc(firebaseDB, GAMES_PATH, roomId);
+
+    try {
+      await runTransaction(firebaseDB, async (transaction) => {
+        const gameDoc = await transaction.get(gameRef);
+        if (!gameDoc.exists()) {
+          throw "Game does not exist.";
+        }
+
+        const numberOfPlayers = gameDoc.data().numberOfPlayers;
+        const completedPlayers = gameDoc.data().numberOfSubmitted;
+        if (completedPlayers === numberOfPlayers) {
+          const gameState = gameDoc.data().state;
+          if (gameState !== RESULT_STATE) {
+            await updateSingleDocument(GAMES_PATH, roomId, {
+              state: RESULT_STATE,
+            });
+            if (completeGameCallback) {
+              completeGameCallback();
+            }
+          }
+        } else {
+          if (incompleteGameCallback) {
+            incompleteGameCallback();
+          }
+        }
+      });
+    } catch (e) {
+      console.error("Transaction failed: ", e);
     }
   }
 
@@ -78,27 +122,13 @@ export default function Gameblock({ params }) {
       answerSubmitted: true,
       eliminated: !isCorrect,
     });
-    const gameData = await getSingleDocument(GAMES_PATH, roomId);
-    if (gameData) {
-      const numberOfPlayers = gameData.numberOfPlayers;
-      const [completedPlayers] = await getMultipleDocuments(
-          USERS_PATH,
-          where("roomId", "==", roomId),
-          where("answerSubmitted", "==", true),
-          where("active", "==", true)
-      );
-      if (completedPlayers === numberOfPlayers) {
-        const gameState = gameData.state;
-        if (gameState !== RESULT_STATE) {
-          await updateSingleDocument(GAMES_PATH, roomId, {
-            state: RESULT_STATE,
-          });
-        }
-        router.push(`/gameblock/result/${roomId}`);
-      } else {
-        router.push(`/gameblock/wait/${roomId}`);
-      }
-    }
+
+    await updateTotalSubmittedAnswers(isCorrect);
+    await updateGameTransition(
+      () => router.push(`/gameblock/wait/${roomId}`),
+      () => router.push(`/gameblock/result/${roomId}`)
+    );
+    router.push(`/gameblock/wait/${roomId}`);
   }
 
   return (

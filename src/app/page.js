@@ -16,6 +16,9 @@ export default function Home() {
       currQuestion: null,
       currQuestionIdx: -1,
       questions: shuffledQuestions,
+      numberOfPlayers: 1,
+      numberOfSubmitted: 0,
+      numberOfEliminated: 0
     });
     router.push(`/join/${roomId}?isHost=true`);
   }
