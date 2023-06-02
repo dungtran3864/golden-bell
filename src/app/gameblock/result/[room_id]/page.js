@@ -14,8 +14,6 @@ import { useRouter } from "next/navigation";
 import useQuestion from "@/hooks/useQuestion";
 import { getSingleDocument, updateSingleDocument } from "@/firebase/utils";
 import listenerGameState from "@/listener/listenerGameState";
-import listenerSurvivors from "@/listener/listenerSurvivors";
-import listenerElimination from "@/listener/listenerElimination";
 
 export default function ResultPage({ params }) {
   const roomId = params.room_id;
@@ -31,8 +29,7 @@ export default function ResultPage({ params }) {
   useEffect(() => {
     validateUser(roomId, user, router);
     listenerGameState(roomId, (state) => setGameState(state));
-    listenerSurvivors(roomId, (count) => setSurvived(count));
-    listenerElimination(roomId, (count) => setEliminated(count));
+    getGameData();
     getCurrPlayerEliminationStatus();
   }, []);
 
@@ -47,6 +44,14 @@ export default function ResultPage({ params }) {
       navigateToChampionScreen();
     }
   }, [gameState]);
+
+  async function getGameData() {
+    const game = await getSingleDocument(GAMES_PATH, roomId);
+    if (game) {
+      setSurvived(game.numberOfPlayers - game.numberOfEliminated);
+      setEliminated(game.numberOfEliminated);
+    }
+  }
 
   async function getCurrPlayerEliminationStatus() {
     const currUser = await getSingleDocument(USERS_PATH, user);
@@ -79,12 +84,13 @@ export default function ResultPage({ params }) {
       await updateSingleDocument(GAMES_PATH, roomId, {
         state: GAMEBLOCK_STATE,
         numberOfPlayers: survived,
+        numberOfSubmitted: 0,
+        numberOfEliminated: 0,
       });
       await navigateToNextRound();
     } else {
       await updateSingleDocument(GAMES_PATH, roomId, {
         state: WINNER_STATE,
-        numberOfPlayers: survived,
       });
       navigateToChampionScreen();
     }
