@@ -7,26 +7,32 @@ import {
   GAMES_PATH,
   HOST_STORAGE_KEY,
   USER_STORAGE_KEY,
-  USERS_PATH, WINNER_STATE,
+  USERS_PATH,
+  WINNER_STATE,
 } from "@/constants";
 import { useRouter } from "next/navigation";
 import useQuestion from "@/hooks/useQuestion";
 import { getSingleDocument, updateSingleDocument } from "@/firebase/utils";
-import useGameState from "@/hooks/useGameState";
-import useParticipation from "@/hooks/useParticipation";
+import listenerGameState from "@/listener/listenerGameState";
+import listenerSurvivors from "@/listener/listenerSurvivors";
+import listenerElimination from "@/listener/listenerElimination";
 
 export default function ResultPage({ params }) {
   const roomId = params.room_id;
   const [user] = useSessionStorage(USER_STORAGE_KEY);
   const [isHost] = useSessionStorage(HOST_STORAGE_KEY);
   const [currQuestion, resetRound, isLastQuestion] = useQuestion(roomId);
-  const [gameState] = useGameState(roomId);
+  const [gameState, setGameState] = useState(null);
   const [eliminationStatus, setEliminationStatus] = useState(null);
-  const [participants, survived, eliminated] = useParticipation(roomId);
+  const [survived, setSurvived] = useState(null);
+  const [eliminated, setEliminated] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
     validateUser(roomId, user, router);
+    listenerGameState(roomId, (state) => setGameState(state));
+    listenerSurvivors(roomId, (count) => setSurvived(count));
+    listenerElimination(roomId, (count) => setEliminated(count));
     getCurrPlayerEliminationStatus();
   }, []);
 

@@ -3,22 +3,24 @@ import { useEffect, useState } from "react";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import { useRouter } from "next/navigation";
 import { GAMEBLOCK_STATE, GAMES_PATH } from "@/constants";
-import useParticipation from "@/hooks/useParticipation";
-import useGameState from "@/hooks/useGameState";
+import listenerGameState from "@/listener/listenerGameState";
 import { updateSingleDocument } from "@/firebase/utils";
 import { validateUser } from "@/utils/authentication";
+import listenerParticipation from "@/listener/listenerParticipation";
 
 export default function LobbyPage({ params }) {
   const roomId = params.room_id;
   const [user] = useSessionStorage("user");
   const router = useRouter();
   const [isHost] = useSessionStorage("isHost");
-  const [participants] = useParticipation(roomId);
-  const [gameState] = useGameState(roomId);
+  const [participants, setParticipants] = useState(0);
+  const [gameState, setGameState] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     validateUser(roomId, user, router);
+    listenerGameState(roomId, (state) => setGameState(state));
+    listenerParticipation(roomId, (count) => setParticipants(count));
   }, []);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export default function LobbyPage({ params }) {
 
   async function startGame(e) {
     e.preventDefault();
-    if (participants > 1) {
+    if (participants > 0) {
       await updateSingleDocument(GAMES_PATH, roomId, {
         state: GAMEBLOCK_STATE,
         numberOfPlayers: participants,

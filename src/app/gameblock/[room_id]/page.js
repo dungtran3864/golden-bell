@@ -29,6 +29,8 @@ export default function Gameblock({ params }) {
     startCountdown();
   }, []);
 
+  console.log('test');
+
   function startCountdown() {
     countdown = timer;
     countdownTracker = setInterval(async function () {
