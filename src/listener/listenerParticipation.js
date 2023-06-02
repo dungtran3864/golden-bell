@@ -1,11 +1,8 @@
-import { onListenMultipleDocumentsRealTime } from "@/firebase/utils";
-import { USERS_PATH } from "@/constants";
-import { where } from "firebase/firestore";
+import { onListenSingleDocumentRealTime } from "@/firebase/utils";
+import { GAMES_PATH } from "@/constants";
 
 export default function listenerParticipation(roomId, callback) {
-  onListenMultipleDocumentsRealTime(
-    USERS_PATH,
-    (participantCount) => callback(participantCount),
-    where("roomId", "==", roomId)
+  onListenSingleDocumentRealTime(GAMES_PATH, roomId, (data) =>
+    callback(data.numberOfPlayers)
   );
 }
