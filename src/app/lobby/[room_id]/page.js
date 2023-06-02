@@ -20,7 +20,9 @@ export default function LobbyPage({ params }) {
   useEffect(() => {
     validateUser(roomId, user, router);
     listenerGameState(roomId, (state) => setGameState(state));
-    listenerParticipation(roomId, (count) => setParticipants(count));
+    if (isHost) {
+      listenerParticipation(roomId, (count) => setParticipants(count));
+    }
   }, []);
 
   useEffect(() => {
@@ -47,7 +49,11 @@ export default function LobbyPage({ params }) {
   return (
     <form onSubmit={startGame}>
       <h1>Welcome to the game lobby!</h1>
-      <h3>This is a lobby. Number of players joined: {participants}</h3>
+      {isHost ? (
+        <h3>Number of players joined: {participants}</h3>
+      ) : (
+        <h3>Waiting for the host to start the game.</h3>
+      )}
       <p>
         Share this room id to your friends to join: <strong>{roomId}</strong>
       </p>
