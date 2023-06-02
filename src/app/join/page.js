@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getSingleDocument } from "@/firebase/utils";
-import { GAMES_PATH, LOBBY_STATE } from "@/constants";
+import { getMultipleDocuments, getSingleDocument } from "@/firebase/utils";
+import { GAMES_PATH, LOBBY_STATE, USERS_PATH } from "@/constants";
+import { where } from "firebase/firestore";
 
 export default function GamePinScreen() {
   const [pin, setPin] = useState(null);
@@ -15,7 +16,17 @@ export default function GamePinScreen() {
     const gameData = await getSingleDocument(GAMES_PATH, pin.trim());
     if (gameData) {
       if (gameData.state === LOBBY_STATE) {
-        router.push(`/join/${pin}?isHost=false`);
+        const [numberOfPlayers] = await getMultipleDocuments(
+          USERS_PATH,
+          where("roomId", "==", pin.trim())
+        );
+        if (numberOfPlayers < 100) {
+          router.push(`/join/${pin}?isHost=false`);
+        } else {
+          setErrorMessage(
+            "This game is already at max capacity. Please join another game."
+          );
+        }
       } else {
         setErrorMessage(
           "This game has already started. Please join another game."

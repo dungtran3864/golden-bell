@@ -23,11 +23,11 @@ export default function useParticipation(roomId) {
   );
 
   onListenMultipleDocumentsRealTime(
-      USERS_PATH,
-      (participantCount) => setEliminated(participantCount),
-      where("roomId", "==", roomId),
-      where("eliminated", "==", true),
-      where("active", "==", true)
+    USERS_PATH,
+    (participantCount) => setEliminated(participantCount),
+    where("roomId", "==", roomId),
+    where("eliminated", "==", true),
+    where("active", "==", true)
   );
 
   return [count, survivors, eliminated];
