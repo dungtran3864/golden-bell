@@ -37,7 +37,7 @@ export default function GamePinScreen() {
           USERS_PATH,
           where("roomId", "==", pin.trim())
         );
-        if (numberOfPlayers < 2) {
+        if (numberOfPlayers < 100) {
           router.push(`/join/${pin}?isHost=false`);
           return;
         }

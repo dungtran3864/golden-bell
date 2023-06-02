@@ -31,7 +31,7 @@ export default function LobbyPage({ params }) {
 
   async function startGame(e) {
     e.preventDefault();
-    if (participants > 0) {
+    if (participants > 1) {
       await updateSingleDocument(GAMES_PATH, roomId, {
         state: GAMEBLOCK_STATE,
         numberOfPlayers: participants,
