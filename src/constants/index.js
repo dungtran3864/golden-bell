@@ -8,4 +8,3 @@ export const USERS_PATH = "users";
 export const QUESTIONS_PATH = "questions";
 export const USER_STORAGE_KEY = "user";
 export const HOST_STORAGE_KEY = "isHost";
-export const MAX_ROOMS_STORAGE_KEY = "maxRooms";

@@ -3,40 +3,25 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSingleDocument } from "@/firebase/utils";
-import { GAMES_PATH, LOBBY_STATE, MAX_ROOMS_STORAGE_KEY } from "@/constants";
-import useLocalStorage from "@/hooks/useLocalStorage";
+import { GAMES_PATH, LOBBY_STATE } from "@/constants";
 
 export default function GamePinScreen() {
   const [pin, setPin] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
-  const [maxRooms, setMaxRooms] = useLocalStorage(MAX_ROOMS_STORAGE_KEY, {});
   const router = useRouter();
-
-  function isMaxRoomAlreadyChecked() {
-    return maxRooms && maxRooms[pin.trim()];
-  }
 
   async function joinRoom(e) {
     e.preventDefault();
-    if (isMaxRoomAlreadyChecked()) {
-      setErrorMessage(
-        "This game is already at max capacity. Please join another game."
-      );
-      return;
-    }
     const gameData = await getSingleDocument(GAMES_PATH, pin.trim());
     if (gameData) {
       if (gameData.state === LOBBY_STATE) {
         if (gameData.numberOfPlayers < 2) {
           router.push(`/join/${pin}?isHost=false`);
-          return;
+        } else {
+          setErrorMessage(
+            "This game is already at max capacity. Please join another game."
+          );
         }
-        const copyMaxRooms = { ...maxRooms };
-        copyMaxRooms[pin.trim()] = true;
-        setMaxRooms(copyMaxRooms);
-        setErrorMessage(
-          "This game is already at max capacity. Please join another game."
-        );
       } else {
         setErrorMessage(
           "This game has already started. Please join another game."
