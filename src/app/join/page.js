@@ -15,7 +15,7 @@ export default function GamePinScreen() {
     const gameData = await getSingleDocument(GAMES_PATH, pin.trim());
     if (gameData) {
       if (gameData.state === LOBBY_STATE) {
-        if (gameData.numberOfPlayers < 2) {
+        if (gameData.numberOfPlayers < 100) {
           router.push(`/join/${pin}?isHost=false`);
         } else {
           setErrorMessage(
