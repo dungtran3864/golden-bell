@@ -2,15 +2,12 @@
 import useQuestion from "@/hooks/useQuestion";
 import { useEffect, useState } from "react";
 import { checkAnswer } from "@/utils";
-import { runTransaction, doc } from "firebase/firestore";
+import { doc } from "firebase/firestore";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import { useRouter } from "next/navigation";
 import { GAMES_PATH, RESULT_STATE, USERS_PATH } from "@/constants";
-import {
-  updateSingleDocument,
-} from "@/firebase/utils";
+import { makeTransaction, updateSingleDocument } from "@/firebase/utils";
 import { validateUser } from "@/utils/authentication";
-import firebaseDB from "@/firebase/initFirebase";
 
 let countdown;
 let countdownTracker;
@@ -47,70 +44,66 @@ export default function Gameblock({ params }) {
       answerSubmitted: true,
       eliminated: true,
     });
-    await updateTotalSubmittedAnswers(false);
-    await updateGameTransition();
+    await makeTransaction((db, transaction) =>
+      updateTotalSubmittedAnswers(db, transaction, false)
+    );
+    await makeTransaction((db, transaction) =>
+      updateGameTransition(db, transaction)
+    );
   }
 
-  async function updateTotalSubmittedAnswers(isCorrect) {
-    const gameRef = doc(firebaseDB, GAMES_PATH, roomId);
+  async function updateTotalSubmittedAnswers(db, transaction, isCorrect) {
+    const gameRef = doc(db, GAMES_PATH, roomId);
 
-    try {
-      await runTransaction(firebaseDB, async (transaction) => {
-        const gameDoc = await transaction.get(gameRef);
-        if (!gameDoc.exists()) {
-          throw "Game does not exist.";
-        }
+    const gameDoc = await transaction.get(gameRef);
+    if (!gameDoc.exists()) {
+      throw "Game does not exist.";
+    }
+    const gameData = gameDoc.data();
 
-        if (isCorrect) {
-          const updatedSubmitted = gameDoc.data().numberOfSubmitted + 1;
-          transaction.update(gameRef, { numberOfSubmitted: updatedSubmitted });
-        } else {
-          const updatedSubmitted = gameDoc.data().numberOfSubmitted + 1;
-          const updatedEliminated = gameDoc.data().numberOfEliminated + 1;
-          transaction.update(gameRef, {
-            numberOfSubmitted: updatedSubmitted,
-            numberOfEliminated: updatedEliminated,
-          });
-        }
+    if (isCorrect) {
+      const updatedSubmitted = gameData.numberOfSubmitted + 1;
+      transaction.update(gameRef, { numberOfSubmitted: updatedSubmitted });
+    } else {
+      const updatedSubmitted = gameData.numberOfSubmitted + 1;
+      const updatedEliminated = gameData.numberOfEliminated + 1;
+      transaction.update(gameRef, {
+        numberOfSubmitted: updatedSubmitted,
+        numberOfEliminated: updatedEliminated,
       });
-    } catch (e) {
-      console.log("Transaction failed: ", e);
     }
   }
 
   async function updateGameTransition(
+    db,
+    transaction,
     incompleteGameCallback,
     completeGameCallback
   ) {
-    const gameRef = doc(firebaseDB, GAMES_PATH, roomId);
+    const gameRef = doc(db, GAMES_PATH, roomId);
 
-    try {
-      await runTransaction(firebaseDB, async (transaction) => {
-        const gameDoc = await transaction.get(gameRef);
-        if (!gameDoc.exists()) {
-          throw "Game does not exist.";
-        }
+    const gameDoc = await transaction.get(gameRef);
+    if (!gameDoc.exists()) {
+      throw "Game does not exist.";
+    }
+    const gameData = gameDoc.data();
 
-        const numberOfPlayers = gameDoc.data().numberOfPlayers;
-        const completedPlayers = gameDoc.data().numberOfSubmitted;
-        if (completedPlayers === numberOfPlayers) {
-          const gameState = gameDoc.data().state;
-          if (gameState !== RESULT_STATE) {
-            await updateSingleDocument(GAMES_PATH, roomId, {
-              state: RESULT_STATE,
-            });
-            if (completeGameCallback) {
-              completeGameCallback();
-            }
-          }
-        } else {
-          if (incompleteGameCallback) {
-            incompleteGameCallback();
-          }
+    const numberOfPlayers = gameData.numberOfPlayers;
+    const completedPlayers = gameData.numberOfSubmitted;
+    if (completedPlayers === numberOfPlayers) {
+      const gameState = gameData.state;
+      if (gameState !== RESULT_STATE) {
+        await updateSingleDocument(GAMES_PATH, roomId, {
+          state: RESULT_STATE,
+        });
+        if (completeGameCallback) {
+          completeGameCallback();
         }
-      });
-    } catch (e) {
-      console.error("Transaction failed: ", e);
+      }
+    } else {
+      if (incompleteGameCallback) {
+        incompleteGameCallback();
+      }
     }
   }
 
@@ -123,10 +116,16 @@ export default function Gameblock({ params }) {
       eliminated: !isCorrect,
     });
 
-    await updateTotalSubmittedAnswers(isCorrect);
-    await updateGameTransition(
-      () => router.push(`/gameblock/wait/${roomId}`),
-      () => router.push(`/gameblock/result/${roomId}`)
+    await makeTransaction((db, transaction) =>
+      updateTotalSubmittedAnswers(db, transaction, isCorrect)
+    );
+    await makeTransaction((db, transaction) =>
+      updateGameTransition(
+        db,
+        transaction,
+        () => router.push(`/gameblock/wait/${roomId}`),
+        () => router.push(`/gameblock/result/${roomId}`)
+      )
     );
     router.push(`/gameblock/wait/${roomId}`);
   }

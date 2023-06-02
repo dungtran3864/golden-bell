@@ -16,7 +16,7 @@ export default function Home() {
       currQuestion: null,
       currQuestionIdx: -1,
       questions: shuffledQuestions,
-      numberOfPlayers: 1,
+      numberOfPlayers: 0,
       numberOfSubmitted: 0,
       numberOfEliminated: 0
     });

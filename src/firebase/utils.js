@@ -7,6 +7,7 @@ import {
   getDocs,
   addDoc,
   onSnapshot,
+  runTransaction,
 } from "firebase/firestore";
 import firebaseDB from "@/firebase/initFirebase";
 
@@ -68,4 +69,14 @@ export function onListenMultipleDocumentsRealTime(
     });
     callback(count, results);
   });
+}
+
+export async function makeTransaction(callback) {
+  try {
+    await runTransaction(firebaseDB, async (transaction) => {
+      await callback(firebaseDB, transaction);
+    });
+  } catch (e) {
+    console.log("Transaction failed: ", e);
+  }
 }
