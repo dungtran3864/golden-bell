@@ -60,7 +60,7 @@ export function onListenMultipleDocumentsRealTime(
   ...queryConstraints
 ) {
   const q = query(collection(firebaseDB, path), ...queryConstraints);
-  const unsubscribe = onSnapshot(q, (querySnapshot) => {
+  return onSnapshot(q, (querySnapshot) => {
     let count = 0;
     const results = [];
     querySnapshot.forEach((doc) => {

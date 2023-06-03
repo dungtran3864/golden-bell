@@ -1,7 +1,7 @@
 "use client";
 import { RESULT_STATE, USER_STORAGE_KEY } from "@/constants";
 import { useRouter } from "next/navigation";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { validateUser } from "@/utils/validation";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import listenerGameState from "@/listener/listenerGameState";
@@ -14,7 +14,12 @@ export default function WaitingPage({ params }) {
 
   useEffect(() => {
     validateUser(roomId, user, router);
-    listenerGameState(roomId, (state) => setGameState(state));
+    const unsubscribe = listenerGameState(roomId, (state) =>
+      setGameState(state)
+    );
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {

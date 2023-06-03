@@ -33,9 +33,14 @@ export default function ResultPage({ params }) {
 
   useEffect(() => {
     validateUser(roomId, user, router);
-    listenerGameState(roomId, (state) => setGameState(state));
+    const unsubscribe = listenerGameState(roomId, (state) =>
+      setGameState(state)
+    );
     getGameData();
     getCurrPlayerEliminationStatus();
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
