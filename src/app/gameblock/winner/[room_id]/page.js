@@ -1,8 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getMultipleDocuments } from "@/firebase/utils";
-import { USER_STORAGE_KEY, USERS_PATH } from "@/constants";
-import { where } from "firebase/firestore";
+import { getSingleDocument } from "@/firebase/utils";
+import { GAMES_PATH, USER_STORAGE_KEY } from "@/constants";
 import useSessionStorage from "@/hooks/useSessionStorage";
 
 export default function WinnerPage({ params }) {
@@ -16,14 +15,11 @@ export default function WinnerPage({ params }) {
   }, []);
 
   async function fetchWinners() {
-    const [winnerCount, winnersResult] = await getMultipleDocuments(
-      USERS_PATH,
-      where("roomId", "==", roomId),
-      where("active", "==", true),
-      where("eliminated", "==", false)
-    );
-    setWinners(winnersResult);
-    setCount(winnerCount);
+    const gameData = await getSingleDocument(GAMES_PATH, roomId);
+    if (gameData) {
+      setWinners(gameData.winners);
+      setCount(gameData.winners.length);
+    }
   }
 
   function consolidationMessage() {
@@ -90,7 +86,9 @@ export default function WinnerPage({ params }) {
     if (count > 1) {
       return (
         <div>
-          <p>Here are all the winners of the game:</p>
+          <p>
+            Here are the <strong>{count} winners</strong> of the game:
+          </p>
           {winners.map((winner, index) => (
             <div key={index}>
               <strong>{winner.name}</strong>

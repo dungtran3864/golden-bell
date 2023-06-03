@@ -12,8 +12,13 @@ import {
 } from "@/constants";
 import { useRouter } from "next/navigation";
 import useQuestion from "@/hooks/useQuestion";
-import { getSingleDocument, updateSingleDocument } from "@/firebase/utils";
+import {
+  getMultipleDocuments,
+  getSingleDocument,
+  updateSingleDocument,
+} from "@/firebase/utils";
 import listenerGameState from "@/listener/listenerGameState";
+import { where } from "firebase/firestore";
 
 export default function ResultPage({ params }) {
   const roomId = params.room_id;
@@ -89,8 +94,15 @@ export default function ResultPage({ params }) {
       });
       await navigateToNextRound();
     } else {
+      const [winnersCount, winners] = await getMultipleDocuments(
+        USERS_PATH,
+        where("roomId", "==", roomId),
+        where("active", "==", true),
+        where("eliminated", "==", false)
+      );
       await updateSingleDocument(GAMES_PATH, roomId, {
         state: WINNER_STATE,
+        winners,
       });
       navigateToChampionScreen();
     }
