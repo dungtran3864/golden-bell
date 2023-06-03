@@ -3,14 +3,18 @@ import { useEffect, useState } from "react";
 import { getSingleDocument } from "@/firebase/utils";
 import { GAMES_PATH, USER_STORAGE_KEY } from "@/constants";
 import useSessionStorage from "@/hooks/useSessionStorage";
+import {validateUser} from "@/utils/validation";
+import {useRouter} from "next/navigation";
 
 export default function WinnerPage({ params }) {
   const roomId = params.room_id;
   const [winners, setWinners] = useState([]);
   const [count, setCount] = useState(null);
   const [user] = useSessionStorage(USER_STORAGE_KEY);
+  const router = useRouter();
 
   useEffect(() => {
+    validateUser(roomId, user, router);
     fetchWinners();
   }, []);
 

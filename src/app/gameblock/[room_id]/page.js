@@ -7,7 +7,7 @@ import useSessionStorage from "@/hooks/useSessionStorage";
 import { useRouter } from "next/navigation";
 import { GAMES_PATH, RESULT_STATE, USERS_PATH } from "@/constants";
 import { makeTransaction, updateSingleDocument } from "@/firebase/utils";
-import { validateUser } from "@/utils/authentication";
+import { validateUser } from "@/utils/validation";
 
 let countdown;
 let countdownTracker;

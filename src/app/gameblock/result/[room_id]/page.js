@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { validateUser } from "@/utils/authentication";
+import { validateUser } from "@/utils/validation";
 import useSessionStorage from "@/hooks/useSessionStorage";
 import {
   GAMEBLOCK_STATE,

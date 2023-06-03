@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { GAMEBLOCK_STATE, GAMES_PATH } from "@/constants";
 import listenerGameState from "@/listener/listenerGameState";
 import { updateSingleDocument } from "@/firebase/utils";
-import { validateUser } from "@/utils/authentication";
+import { validateUser } from "@/utils/validation";
 import listenerParticipation from "@/listener/listenerParticipation";
 
 export default function LobbyPage({ params }) {
