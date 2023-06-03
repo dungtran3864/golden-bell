@@ -53,6 +53,7 @@ export default function Gameblock({ params }) {
   }
 
   async function updateTotalSubmittedAnswers(db, transaction, isCorrect) {
+    console.log("hello");
     const gameRef = doc(db, GAMES_PATH, roomId);
 
     const gameDoc = await transaction.get(gameRef);
@@ -93,7 +94,7 @@ export default function Gameblock({ params }) {
     if (completedPlayers === numberOfPlayers) {
       const gameState = gameData.state;
       if (gameState !== RESULT_STATE) {
-        await updateSingleDocument(GAMES_PATH, roomId, {
+        transaction.update(gameRef, {
           state: RESULT_STATE,
         });
         if (completeGameCallback) {
