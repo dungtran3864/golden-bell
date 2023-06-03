@@ -53,7 +53,6 @@ export default function Gameblock({ params }) {
   }
 
   async function updateTotalSubmittedAnswers(db, transaction, isCorrect) {
-    console.log("hello");
     const gameRef = doc(db, GAMES_PATH, roomId);
 
     const gameDoc = await transaction.get(gameRef);
