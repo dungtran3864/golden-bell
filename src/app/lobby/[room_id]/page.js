@@ -20,7 +20,11 @@ export default function LobbyPage({ params }) {
   useEffect(() => {
     validateUser(roomId, user, router);
     listenerGameState(roomId, (state) => setGameState(state));
-    listenerParticipation(roomId, (count) => setParticipants(count));
+    const unsubscribe = listenerParticipation(roomId, (count) => setParticipants(count));
+    return () => {
+      console.log("hee")
+      unsubscribe();
+    };
   }, []);
 
   useEffect(() => {

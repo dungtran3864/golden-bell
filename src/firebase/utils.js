@@ -1,13 +1,13 @@
 import {
+  addDoc,
+  collection,
   doc,
   getDoc,
-  updateDoc,
-  collection,
-  query,
   getDocs,
-  addDoc,
   onSnapshot,
+  query,
   runTransaction,
+  updateDoc,
 } from "firebase/firestore";
 import firebaseDB from "@/firebase/initFirebase";
 
@@ -47,7 +47,7 @@ export async function addSingleDocument(path, requestBody) {
 }
 
 export function onListenSingleDocumentRealTime(path, pathSegments, callback) {
-  const unsub = onSnapshot(doc(firebaseDB, path, pathSegments), (doc) => {
+  return onSnapshot(doc(firebaseDB, path, pathSegments), (doc) => {
     if (doc.exists()) {
       callback(doc.data());
     }
