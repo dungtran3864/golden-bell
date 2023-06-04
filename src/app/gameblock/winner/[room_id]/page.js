@@ -1,16 +1,24 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getSingleDocument } from "@/firebase/utils";
-import { GAMES_PATH, USER_STORAGE_KEY } from "@/constants";
+import { getMultipleDocuments, getSingleDocument } from "@/firebase/utils";
+import {
+  GAMES_PATH,
+  HOST_STORAGE_KEY,
+  USER_STORAGE_KEY,
+  USERS_PATH,
+} from "@/constants";
 import useSessionStorage from "@/hooks/useSessionStorage";
-import {validateUser} from "@/utils/validation";
-import {useRouter} from "next/navigation";
+import { validateUser } from "@/utils/validation";
+import { useRouter } from "next/navigation";
+import { doc, where, writeBatch } from "firebase/firestore";
+import firebaseDB from "@/firebase/initFirebase";
 
 export default function WinnerPage({ params }) {
   const roomId = params.room_id;
   const [winners, setWinners] = useState([]);
   const [count, setCount] = useState(null);
   const [user] = useSessionStorage(USER_STORAGE_KEY);
+  const [isHost] = useSessionStorage(HOST_STORAGE_KEY);
   const router = useRouter();
 
   useEffect(() => {
@@ -104,11 +112,34 @@ export default function WinnerPage({ params }) {
     return null;
   }
 
+  async function cleanUpGame() {
+    if (isHost) {
+      const [usersCount, users] = await getMultipleDocuments(
+        USERS_PATH,
+        where("roomId", "==", roomId)
+      );
+      const gameData = await getSingleDocument(GAMES_PATH, roomId);
+      const batch = writeBatch(firebaseDB);
+      users.forEach((user) => {
+        const userRef = doc(firebaseDB, USERS_PATH, user.uid);
+        batch.delete(userRef);
+      });
+      if (gameData) {
+        const gameRef = doc(firebaseDB, GAMES_PATH, roomId);
+        batch.delete(gameRef);
+      }
+      await batch.commit();
+    }
+    router.push("/");
+  }
+
   return (
     <div>
       {showHeader()}
       {showBodyMessage()}
-      <button type={"button"}>Exit game</button>
+      <button type={"button"} onClick={cleanUpGame}>
+        Exit game
+      </button>
     </div>
   );
 }
