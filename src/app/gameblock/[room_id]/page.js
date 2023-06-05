@@ -74,12 +74,7 @@ export default function Gameblock({ params }) {
     }
   }
 
-  async function updateGameTransition(
-    db,
-    transaction,
-    incompleteGameCallback,
-    completeGameCallback
-  ) {
+  async function updateGameTransition(db, transaction) {
     const gameRef = doc(db, GAMES_PATH, roomId);
 
     const gameDoc = await transaction.get(gameRef);
@@ -96,13 +91,6 @@ export default function Gameblock({ params }) {
         transaction.update(gameRef, {
           state: RESULT_STATE,
         });
-        if (completeGameCallback) {
-          completeGameCallback();
-        }
-      }
-    } else {
-      if (incompleteGameCallback) {
-        incompleteGameCallback();
       }
     }
   }
