@@ -98,6 +98,7 @@ export default function Gameblock({ params }) {
   async function submitAnswer(e) {
     e.preventDefault();
     clearInterval(countdownTracker);
+    router.push(`/gameblock/wait/${roomId}`);
     const isCorrect = checkAnswer(answer, currQuestion.answer);
     await updateSingleDocument(USERS_PATH, user, {
       answerSubmitted: true,
@@ -108,14 +109,9 @@ export default function Gameblock({ params }) {
       updateTotalSubmittedAnswers(db, transaction, isCorrect)
     );
     await makeTransaction((db, transaction) =>
-      updateGameTransition(
-        db,
-        transaction,
-        () => router.push(`/gameblock/wait/${roomId}`),
-        () => router.push(`/gameblock/result/${roomId}`)
-      )
+      updateGameTransition(db, transaction)
     );
-    router.push(`/gameblock/wait/${roomId}`);
+    console.log('done')
   }
 
   return (
