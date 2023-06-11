@@ -111,24 +111,54 @@ export default function Gameblock({ params }) {
     await makeTransaction((db, transaction) =>
       updateGameTransition(db, transaction)
     );
-    console.log('done')
   }
 
   return (
-    <form onSubmit={submitAnswer}>
-      <p>
-        Time left: <strong>{timer}</strong> seconds
-      </p>
-      <p>Question: {currQuestion?.question}</p>
-      <label htmlFor="answer">Type in your answer:</label>
-      <input
-        type="text"
-        id="answer"
-        name="answer"
-        onChange={(e) => setAnswer(e.target.value)}
-      />
-      <br />
-      <button type={"submit"}>Submit</button>
-    </form>
+    <div className={"flex justify-center mt-8"}>
+      <div className={"flex-auto"} />
+      <div className={"flex-auto w-6/12"}>
+        <form
+          onSubmit={submitAnswer}
+          className={"bg-yellow-200 shadow-md rounded px-8 pt-6 pb-8 mb-4"}
+        >
+          <div className={"mb-4"}>
+            <p className={"text-lg"}>
+              Time left: <strong className={"text-red-500"}>{timer}</strong>{" "}
+              seconds
+            </p>
+            <p className={"mb-2 text-lg"}>
+              Question:{" "}
+              <strong className={"text-blue-900"}>
+                {currQuestion?.question}
+              </strong>
+            </p>
+            <label
+              htmlFor="answer"
+              className={"block text-lg font-bold mb-2"}
+            >
+              Type in your answer:
+            </label>
+            <input
+              type="text"
+              id="answer"
+              name="answer"
+              onChange={(e) => setAnswer(e.target.value)}
+              className={
+                "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+              }
+            />
+          </div>
+          <button
+            type={"submit"}
+            className={
+              "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 mb-4"
+            }
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+      <div className={"flex-auto"} />
+    </div>
   );
 }

@@ -18,7 +18,7 @@ export default function Home() {
       questions: shuffledQuestions,
       numberOfPlayers: 0,
       numberOfSubmitted: 0,
-      numberOfEliminated: 0
+      numberOfEliminated: 0,
     });
     router.push(`/join/${roomId}?isHost=true`);
   }
@@ -28,14 +28,35 @@ export default function Home() {
   }
 
   return (
-    <div>
-      <h1>Welcome to Golden Bell</h1>
-      <button type={"button"} onClick={joinGame}>
-        Join a game
-      </button>
-      <button type={"button"} onClick={createNewGame}>
-        Create a new game
-      </button>
+    <div className={"flex flex-col items-center"}>
+      <h1
+        className={
+          "mb-10 text-4xl font-extrabold leading-none tracking-tight text-blue-900 md:text-5xl lg:text-6xl mt-10"
+        }
+      >
+        Welcome to Golden Bell
+      </h1>
+      <div className={"flex flex-row"}>
+        <button
+          className={
+            "bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mr-2"
+          }
+          type={"button"}
+          onClick={joinGame}
+        >
+          Join a game
+        </button>
+        <button
+          className={
+            "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          }
+          type={"button"}
+          onClick={createNewGame}
+        >
+          Create a new game
+        </button>
+      </div>
+      <img src={"golden-bell-clipart-design-illustration-free-png.webp"} alt={"golden bell image"} className={"object-scale-down h-48 w-96 mt-24"} />
     </div>
   );
 }

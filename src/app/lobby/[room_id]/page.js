@@ -53,21 +53,42 @@ export default function LobbyPage({ params }) {
   }
 
   return (
-    <form onSubmit={startGame}>
-      <h1>Welcome to the game lobby!</h1>
-      {isHost ? (
-        <h3>Number of players joined: {participants}</h3>
-      ) : (
-        <h3>
-          Waiting for the host to start the game. Number of players joined:{" "}
-          {participants}
-        </h3>
-      )}
-      <p>
-        Share this room id to your friends to join: <strong>{roomId}</strong>
-      </p>
-      {isHost && <button type={"submit"}>Start game</button>}
-      <p>{errorMessage}</p>
+    <form onSubmit={startGame} className={"flex flex-col items-center"}>
+      <h1
+        className={
+          "mb-10 text-4xl font-extrabold leading-none tracking-tight text-blue-900 md:text-5xl lg:text-6xl mt-10"
+        }
+      >
+        Welcome to the game lobby!
+      </h1>
+      <div className={"m-4"}>
+        {isHost ? (
+          <p className={"mb-2"}>
+            Number of players joined:{" "}
+            <strong className={"text-purple-700"}>{participants}</strong>
+          </p>
+        ) : (
+          <p className={"mb-2"}>
+            Waiting for the host to start the game. Number of players joined:{" "}
+            <strong className={"text-purple-700"}>{participants}</strong>
+          </p>
+        )}
+        <p className={"mb-2"}>
+          Share this room id to your friends to join:{" "}
+          <strong className={"text-blue-900"}>{roomId}</strong>
+        </p>
+        <p className={"text-red-500 font-bold mb-6"}>{errorMessage}</p>
+        {isHost && (
+          <button
+            type={"submit"}
+            className={
+              "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2"
+            }
+          >
+            Start game
+          </button>
+        )}
+      </div>
     </form>
   );
 }

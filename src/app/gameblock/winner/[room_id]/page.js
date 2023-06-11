@@ -36,18 +36,42 @@ export default function WinnerPage({ params }) {
 
   function consolidationMessage() {
     return (
-      <div>
-        <h1>Game over!</h1>
-        <h2>Better luck next time!</h2>
+      <div className={"flex flex-col items-center mb-4"}>
+        <h1
+          className={
+            "mb-4 text-4xl font-extrabold leading-none tracking-tight text-blue-900 md:text-5xl lg:text-6xl mt-10"
+          }
+        >
+          Game over!
+        </h1>
+        <h2
+          className={
+            "mb-4 text-4xl font-extrabold leading-none tracking-tight text-purple-700 mt-10"
+          }
+        >
+          Better luck next time!
+        </h2>
       </div>
     );
   }
 
   function winningMessage(name) {
     return (
-      <div>
-        <h1>Congratulations!</h1>
-        <h2>You are the winner, {name}!</h2>
+      <div className={"flex flex-col items-center mb-10"}>
+        <h1
+          className={
+            "mb-4 text-4xl font-extrabold leading-none tracking-tight text-blue-900 md:text-5xl lg:text-6xl mt-10"
+          }
+        >
+          Congratulations!
+        </h1>
+        <h2
+          className={
+            "mb-4 text-4xl font-extrabold leading-none tracking-tight text-purple-700 mt-10"
+          }
+        >
+          You are the winner, {name}!
+        </h2>
       </div>
     );
   }
@@ -55,7 +79,15 @@ export default function WinnerPage({ params }) {
   function showHeader() {
     // Case: no one wins the game
     if (count === 0) {
-      return <h1>Game over!</h1>;
+      return (
+        <h1
+          className={
+            "mb-4 text-4xl font-extrabold leading-none tracking-tight text-blue-900 md:text-5xl lg:text-6xl mt-10"
+          }
+        >
+          Game over!
+        </h1>
+      );
     }
     // Case: you are NOT the winner
     if (count === 1 && user !== winners[0].uid) {
@@ -81,7 +113,11 @@ export default function WinnerPage({ params }) {
     // Case: no one wins the game
     if (count === 0) {
       return (
-        <p>
+        <p
+          className={
+            "text-xl font-bold leading-none tracking-tight text-purple-700 mt-10 mb-10"
+          }
+        >
           Unfortunately, no one is able to win this game. Better luck next time!
         </p>
       );
@@ -89,7 +125,11 @@ export default function WinnerPage({ params }) {
     // Case: you are NOT the winner
     if (count === 1 && user !== winners[0]?.uid) {
       return (
-        <p>
+        <p
+          className={
+            "mb-10 text-xl font-bold leading-none tracking-tight text-purple-700"
+          }
+        >
           The winner of the game is: <strong>{winners[0]?.name}</strong>
         </p>
       );
@@ -97,13 +137,19 @@ export default function WinnerPage({ params }) {
     // Case: multiple winners
     if (count > 1) {
       return (
-        <div>
-          <p>
+        <div className={"mb-10"}>
+          <p
+            className={
+              "text-xl font-bold leading-none tracking-tight text-purple-700"
+            }
+          >
             Here are the <strong>{count} winners</strong> of the game:
           </p>
           {winners.map((winner, index) => (
-            <div key={index}>
-              <strong>{winner.name}</strong>
+            <div key={index} className={"mt-4 text-center"}>
+              <strong className={"font-bold text-purple-700"}>
+                {winner.name}
+              </strong>
             </div>
           ))}
         </div>
@@ -134,10 +180,16 @@ export default function WinnerPage({ params }) {
   }
 
   return (
-    <div>
+    <div className={"flex flex-col items-center"}>
       {showHeader()}
       {showBodyMessage()}
-      <button type={"button"} onClick={cleanUpGame}>
+      <button
+        type={"button"}
+        onClick={cleanUpGame}
+        className={
+          "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 mb-4"
+        }
+      >
         Exit game
       </button>
     </div>

@@ -125,24 +125,46 @@ export default function ResultPage({ params }) {
   }
 
   return (
-    <div>
-      <h1>Summary of this round</h1>
-      <strong>You are {getEliminationMessage(eliminationStatus)}</strong>
-      <p>Question: {currQuestion?.question}</p>
-      <p>
-        Answer: <strong>{currQuestion?.answer}</strong>
-      </p>
-      <p>
-        Number of players survived: <strong>{survived}</strong>
-      </p>
-      <p>
-        Number of players eliminated: <strong>{eliminated}</strong>
-      </p>
-      {isHost && (
-        <button type={"button"} onClick={proceed}>
-          Proceed
-        </button>
-      )}
+    <div className={"flex justify-center mt-8"}>
+      <div className={""}>
+        <h1
+          className={
+            "mb-4 text-4xl font-extrabold leading-none tracking-tight text-blue-900 mt-10"
+          }
+        >
+          Summary of this round
+        </h1>
+        <p className={"text-purple-700 font-extrabold mb-4 text-2xl"}>
+          You are {getEliminationMessage(eliminationStatus)}
+        </p>
+        <p className={"mb-1"}>
+          Question:{" "}
+          <strong className={"text-blue-900"}>{currQuestion?.question}</strong>
+        </p>
+        <p className={"mb-1"}>
+          Answer:{" "}
+          <strong className={"text-blue-900"}>{currQuestion?.answer}</strong>
+        </p>
+        <p className={"mb-1"}>
+          Number of players survived:{" "}
+          <strong className={"text-purple-700"}>{survived}</strong>
+        </p>
+        <p className={"mb-6"}>
+          Number of players eliminated:{" "}
+          <strong className={"text-red-500"}>{eliminated}</strong>
+        </p>
+        {isHost && (
+          <button
+            type={"button"}
+            onClick={proceed}
+            className={
+              "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 mb-4"
+            }
+          >
+            Proceed
+          </button>
+        )}
+      </div>
     </div>
   );
 }
