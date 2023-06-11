@@ -46,7 +46,7 @@ export default function WinnerPage({ params }) {
         </h1>
         <h2
           className={
-            "mb-4 text-4xl font-extrabold leading-none tracking-tight text-purple-700 mt-10"
+            "mb-4 text-xl md:text-2xl lg:text-4xl font-extrabold leading-none tracking-tight text-purple-700 mt-10"
           }
         >
           Better luck next time!
@@ -67,7 +67,7 @@ export default function WinnerPage({ params }) {
         </h1>
         <h2
           className={
-            "mb-4 text-4xl font-extrabold leading-none tracking-tight text-purple-700 mt-10"
+            "mb-4 text-xl md:text-2xl lg:text-4xl font-extrabold leading-none tracking-tight text-purple-700 mt-10"
           }
         >
           You are the winner, {name}!
@@ -115,7 +115,7 @@ export default function WinnerPage({ params }) {
       return (
         <p
           className={
-            "text-xl font-bold leading-none tracking-tight text-purple-700 mt-10 mb-10"
+            "text-base md:text-lg lg:text-xl font-bold leading-none tracking-tight text-purple-700 mt-10 mb-10 text-center"
           }
         >
           Unfortunately, no one is able to win this game. Better luck next time!
@@ -127,7 +127,7 @@ export default function WinnerPage({ params }) {
       return (
         <p
           className={
-            "mb-10 text-xl font-bold leading-none tracking-tight text-purple-700"
+            "mb-10 text-base md:text-lg lg:text-xl font-bold leading-none tracking-tight text-purple-700"
           }
         >
           The winner of the game is: <strong>{winners[0]?.name}</strong>
@@ -140,7 +140,7 @@ export default function WinnerPage({ params }) {
         <div className={"mb-10"}>
           <p
             className={
-              "text-xl font-bold leading-none tracking-tight text-purple-700"
+              "text-base md:text-lg lg:text-xl font-bold leading-none tracking-tight text-purple-700"
             }
           >
             Here are the <strong>{count} winners</strong> of the game:

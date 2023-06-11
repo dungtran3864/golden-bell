@@ -125,7 +125,7 @@ export default function ResultPage({ params }) {
   }
 
   return (
-    <div className={"flex justify-center mt-8"}>
+    <div className={"flex justify-start md:justify-center mt-8"}>
       <div className={""}>
         <h1
           className={
