@@ -126,7 +126,7 @@ export default function ResultPage({ params }) {
 
   return (
     <div className={"flex justify-start md:justify-center mt-8"}>
-      <div className={""}>
+      <div>
         <h1
           className={
             "mb-4 text-4xl font-extrabold leading-none tracking-tight text-blue-900 mt-10"

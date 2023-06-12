@@ -36,7 +36,7 @@ export default function WinnerPage({ params }) {
 
   function consolidationMessage() {
     return (
-      <div className={"flex flex-col items-center mb-4"}>
+      <div className={"flex flex-col md:items-center mb-4"}>
         <h1
           className={
             "mb-4 text-4xl font-extrabold leading-none tracking-tight text-blue-900 md:text-5xl lg:text-6xl mt-10"
@@ -57,7 +57,7 @@ export default function WinnerPage({ params }) {
 
   function winningMessage(name) {
     return (
-      <div className={"flex flex-col items-center mb-10"}>
+      <div className={"flex flex-col md:items-center mb-10"}>
         <h1
           className={
             "mb-4 text-4xl font-extrabold leading-none tracking-tight text-blue-900 md:text-5xl lg:text-6xl mt-10"
@@ -115,7 +115,7 @@ export default function WinnerPage({ params }) {
       return (
         <p
           className={
-            "text-base md:text-lg lg:text-xl font-bold leading-none tracking-tight text-purple-700 mt-10 mb-10 text-center"
+            "text-base md:text-lg lg:text-xl font-bold leading-none tracking-tight text-purple-700 mt-10 mb-10"
           }
         >
           Unfortunately, no one is able to win this game. Better luck next time!
@@ -146,7 +146,7 @@ export default function WinnerPage({ params }) {
             Here are the <strong>{count} winners</strong> of the game:
           </p>
           {winners.map((winner, index) => (
-            <div key={index} className={"mt-4 text-center"}>
+            <div key={index} className={"mt-4 md:text-center"}>
               <strong className={"font-bold text-purple-700"}>
                 {winner.name}
               </strong>
@@ -180,18 +180,20 @@ export default function WinnerPage({ params }) {
   }
 
   return (
-    <div className={"flex flex-col items-center"}>
+    <div className={"flex flex-col md:items-center"}>
       {showHeader()}
       {showBodyMessage()}
-      <button
-        type={"button"}
-        onClick={cleanUpGame}
-        className={
-          "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 mb-4"
-        }
-      >
-        Exit game
-      </button>
+      <div>
+        <button
+          type={"button"}
+          onClick={cleanUpGame}
+          className={
+            "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 mb-4"
+          }
+        >
+          Exit game
+        </button>
+      </div>
     </div>
   );
 }

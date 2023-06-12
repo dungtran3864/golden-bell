@@ -28,7 +28,7 @@ export default function Home() {
   }
 
   return (
-    <div className={"flex flex-col items-center"}>
+    <div className={"flex flex-col md:items-center"}>
       <h1
         className={
           "mb-10 text-4xl font-extrabold leading-none tracking-tight text-blue-900 md:text-5xl lg:text-6xl mt-10"
