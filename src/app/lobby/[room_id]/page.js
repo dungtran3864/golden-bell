@@ -54,14 +54,14 @@ export default function LobbyPage({ params }) {
 
   return (
     <form onSubmit={startGame} className={"flex flex-col md:items-center"}>
-      <h1
-        className={
-          "mb-10 text-4xl font-extrabold leading-none tracking-tight text-blue-900 md:text-5xl lg:text-6xl mt-10"
-        }
-      >
-        Welcome to the game lobby!
-      </h1>
       <div>
+        <h1
+          className={
+            "mb-10 text-4xl font-extrabold leading-none tracking-tight text-blue-900 md:text-5xl mt-10"
+          }
+        >
+          Welcome to the game lobby!
+        </h1>
         {isHost ? (
           <p className={"mb-2"}>
             Number of players joined:{" "}

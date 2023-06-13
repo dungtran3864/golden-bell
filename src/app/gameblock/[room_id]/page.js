@@ -142,6 +142,7 @@ export default function Gameblock({ params }) {
               type="text"
               id="answer"
               name="answer"
+              autoComplete={"off"}
               onChange={(e) => setAnswer(e.target.value)}
               required
               className={

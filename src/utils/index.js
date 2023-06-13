@@ -30,18 +30,15 @@ export function shuffle(array) {
   return array;
 }
 
-export function checkAnswer(toBeCompared, target) {
-  if (toBeCompared === null && target === null) {
+export function checkAnswer(yourAnswer, correctAnswer) {
+  if (yourAnswer === null && correctAnswer === null) {
     return true;
   }
-  if (toBeCompared === null && target !== null) {
+  if (yourAnswer === null && correctAnswer !== null) {
     return false;
   }
-  if (toBeCompared !== null && target === null) {
+  if (yourAnswer !== null && correctAnswer === null) {
     return false;
   }
-  return toBeCompared
-    .trim()
-    .toLowerCase()
-    .includes(target.trim().toLowerCase());
+  return yourAnswer.trim().toLowerCase() === correctAnswer.trim().toLowerCase();
 }
