@@ -44,14 +44,16 @@ export default function ResultPage({ params }) {
   }, []);
 
   useEffect(() => {
-    if (gameState === GAMEBLOCK_STATE) {
-      if (!eliminationStatus) {
-        navigateToNextRound();
-      } else {
-        crossEliminated();
+    if (!isHost) {
+      if (gameState === GAMEBLOCK_STATE) {
+        if (!eliminationStatus) {
+          navigateToNextRound();
+        } else {
+          crossEliminated();
+        }
+      } else if (gameState === WINNER_STATE) {
+        navigateToChampionScreen();
       }
-    } else if (gameState === WINNER_STATE) {
-      navigateToChampionScreen();
     }
   }, [gameState]);
 
@@ -74,7 +76,11 @@ export default function ResultPage({ params }) {
     await updateSingleDocument(USERS_PATH, user, {
       answerSubmitted: false,
     });
-    router.push(`/gameblock/${roomId}`);
+    if (isHost && eliminationStatus) {
+      router.push(`/gameblock/wait/${roomId}`);
+    } else {
+      router.push(`/gameblock/${roomId}`);
+    }
   }
 
   async function navigateToChampionScreen() {
