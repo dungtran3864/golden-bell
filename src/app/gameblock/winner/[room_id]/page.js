@@ -21,6 +21,7 @@ export default function WinnerPage({ params }) {
   const [user] = useSessionStorage(USER_STORAGE_KEY);
   const [isHost] = useSessionStorage(HOST_STORAGE_KEY);
   const [processing, setProcessing] = useState(false);
+  const [isLoading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -29,10 +30,16 @@ export default function WinnerPage({ params }) {
   }, []);
 
   async function fetchWinners() {
-    const gameData = await getSingleDocument(GAMES_PATH, roomId);
-    if (gameData) {
-      setWinners(gameData.winners);
-      setCount(gameData.winners.length);
+    try {
+      const gameData = await getSingleDocument(GAMES_PATH, roomId);
+      if (gameData) {
+        setWinners(gameData.winners);
+        setCount(gameData.winners.length);
+      }
+    } catch (error) {
+      console.log("Failed to fetch winner", error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -188,7 +195,11 @@ export default function WinnerPage({ params }) {
     router.push("/");
   }
 
-  return (
+  return isLoading ? (
+    <div className={"flex flex-col md:items-center mt-8"}>
+      <Spinner twH={"h-24"} twW={"w-24"} />
+    </div>
+  ) : (
     <div className={"flex flex-col md:items-center"}>
       {showHeader()}
       {showBodyMessage()}
