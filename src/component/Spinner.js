@@ -25,12 +25,7 @@ export default function Spinner(props) {
   );
 }
 
-Spinner.defaultProps = {
-  twH: "w-8",
-  twW: "h-8",
-};
-
 Spinner.propTypes = {
-  twH: PropTypes.string,
-  twW: PropTypes.string,
+  twH: PropTypes.string.isRequired,
+  twW: PropTypes.string.isRequired,
 };
