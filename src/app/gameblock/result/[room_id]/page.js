@@ -135,7 +135,6 @@ export default function ResultPage({ params }) {
       }
     } catch (error) {
       console.log("Failed to proceed to next round", error);
-    } finally {
       setProcessing(false);
     }
   }

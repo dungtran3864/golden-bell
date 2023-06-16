@@ -188,7 +188,6 @@ export default function WinnerPage({ params }) {
         await batch.commit();
       } catch (error) {
         console.log("Failed to clean up the game", error);
-      } finally {
         setProcessing(false);
       }
     }

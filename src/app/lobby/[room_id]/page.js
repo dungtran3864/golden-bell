@@ -56,7 +56,6 @@ export default function LobbyPage({ params }) {
       }
     } catch (error) {
       console.log("Failed to start the game", error);
-    } finally {
       setProcessing(false);
     }
   }

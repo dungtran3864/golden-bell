@@ -53,7 +53,6 @@ export default function JoinPage({ params }) {
       }
     } catch (error) {
       console.log("Failed to join the game", error);
-    } finally {
       setProcessing(false);
     }
   }

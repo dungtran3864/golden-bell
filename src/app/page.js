@@ -28,7 +28,6 @@ export default function Home() {
       router.push(`/join/${roomId}?isHost=true`);
     } catch (error) {
       console.log("Failed to create a game", error);
-    } finally {
       setProcessing(false);
     }
   }
