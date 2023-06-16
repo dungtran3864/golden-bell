@@ -62,6 +62,7 @@ export default function Home() {
           }
           type={"button"}
           onClick={createNewGame}
+          disabled={processing}
         >
           {processing ? <Spinner twW={"w-6"} twH={"h-6"} /> : "Create a game"}
         </button>
