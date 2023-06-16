@@ -14,7 +14,8 @@ let countdownTracker;
 
 export default function Gameblock({ params }) {
   const roomId = params.room_id;
-  const [currQuestion] = useQuestion(roomId);
+  const [currQuestion, resetRound, isQuestionRunOut, isLoadingQuestion] =
+    useQuestion(roomId);
   const [user] = useSessionStorage("user");
   const [answer, setAnswer] = useState(null);
   const [timer, setTimer] = useState(15);
@@ -129,13 +130,10 @@ export default function Gameblock({ params }) {
             <p className={"mb-2 text-lg"}>
               Question:{" "}
               <strong className={"text-blue-900"}>
-                {currQuestion?.question}
+                {isLoadingQuestion ? "..." : currQuestion?.question}
               </strong>
             </p>
-            <label
-              htmlFor="answer"
-              className={"block text-lg font-bold mb-2"}
-            >
+            <label htmlFor="answer" className={"block text-lg font-bold mb-2"}>
               Type in your answer:
             </label>
             <input
