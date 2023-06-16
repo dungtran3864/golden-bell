@@ -95,7 +95,7 @@ export default function LobbyPage({ params }) {
             }
             disabled={processing}
           >
-            {processing ? <Spinner /> : "Start game"}
+            {processing ? <Spinner twW={"w-6"} twH={"h-6"} /> : "Start game"}
           </button>
         )}
       </div>

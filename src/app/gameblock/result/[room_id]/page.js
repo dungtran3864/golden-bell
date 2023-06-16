@@ -202,7 +202,7 @@ export default function ResultPage({ params }) {
             }
             disabled={processing}
           >
-            {processing ? <Spinner /> : "Proceed"}
+            {processing ? <Spinner twW={"w-6"} twH={"h-6"} /> : "Proceed"}
           </button>
         )}
       </div>

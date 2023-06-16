@@ -1,6 +1,8 @@
 import "@/global.css";
 import PropTypes from "prop-types";
-export default function Spinner({ twH = "h-6", twW = "w-6" }) {
+export default function Spinner(props) {
+  const { twW, twH } = props;
+
   return (
     <div role="status">
       <svg
@@ -22,6 +24,11 @@ export default function Spinner({ twH = "h-6", twW = "w-6" }) {
     </div>
   );
 }
+
+Spinner.defaultProps = {
+  twH: "w-8",
+  twW: "h-8",
+};
 
 Spinner.propTypes = {
   twH: PropTypes.string,
