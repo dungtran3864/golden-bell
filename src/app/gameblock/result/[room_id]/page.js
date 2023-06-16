@@ -19,16 +19,20 @@ import {
 } from "@/firebase/utils";
 import listenerGameState from "@/listener/listenerGameState";
 import { where } from "firebase/firestore";
+import Spinner from "@/component/Spinner";
 
 export default function ResultPage({ params }) {
   const roomId = params.room_id;
   const [user] = useSessionStorage(USER_STORAGE_KEY);
   const [isHost] = useSessionStorage(HOST_STORAGE_KEY);
-  const [currQuestion, resetRound, isLastQuestion] = useQuestion(roomId);
+  const [currQuestion, resetRound, isLastQuestion, isLoadingQuestion] =
+    useQuestion(roomId);
   const [gameState, setGameState] = useState(null);
   const [eliminationStatus, setEliminationStatus] = useState(null);
   const [survived, setSurvived] = useState(null);
   const [eliminated, setEliminated] = useState(null);
+  const [isLoading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -36,12 +40,22 @@ export default function ResultPage({ params }) {
     const unsubscribe = listenerGameState(roomId, (state) =>
       setGameState(state)
     );
-    getGameData();
-    getCurrPlayerEliminationStatus();
+    fetchData();
     return () => {
       unsubscribe();
     };
   }, []);
+
+  async function fetchData() {
+    try {
+      await getGameData();
+      await getCurrPlayerEliminationStatus();
+    } catch (error) {
+      console.log("Failed to fetch result summary data", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     if (!isHost) {
@@ -95,27 +109,34 @@ export default function ResultPage({ params }) {
   }
 
   async function proceed() {
-    if (survived > 1 && !isLastQuestion) {
-      await resetRound();
-      await updateSingleDocument(GAMES_PATH, roomId, {
-        state: GAMEBLOCK_STATE,
-        numberOfPlayers: survived,
-        numberOfSubmitted: 0,
-        numberOfEliminated: 0,
-      });
-      await navigateToNextRound();
-    } else {
-      const [winnersCount, winners] = await getMultipleDocuments(
-        USERS_PATH,
-        where("roomId", "==", roomId),
-        where("active", "==", true),
-        where("eliminated", "==", false)
-      );
-      await updateSingleDocument(GAMES_PATH, roomId, {
-        state: WINNER_STATE,
-        winners,
-      });
-      navigateToChampionScreen();
+    setProcessing(true);
+    try {
+      if (survived > 1 && !isLastQuestion) {
+        await resetRound();
+        await updateSingleDocument(GAMES_PATH, roomId, {
+          state: GAMEBLOCK_STATE,
+          numberOfPlayers: survived,
+          numberOfSubmitted: 0,
+          numberOfEliminated: 0,
+        });
+        await navigateToNextRound();
+      } else {
+        const [winnersCount, winners] = await getMultipleDocuments(
+          USERS_PATH,
+          where("roomId", "==", roomId),
+          where("active", "==", true),
+          where("eliminated", "==", false)
+        );
+        await updateSingleDocument(GAMES_PATH, roomId, {
+          state: WINNER_STATE,
+          winners,
+        });
+        navigateToChampionScreen();
+      }
+    } catch (error) {
+      console.log("Failed to proceed to next round", error);
+    } finally {
+      setProcessing(false);
     }
   }
 
@@ -141,23 +162,36 @@ export default function ResultPage({ params }) {
           Summary of this round
         </h1>
         <p className={"text-purple-700 font-extrabold mb-4 text-2xl"}>
-          You are {getEliminationMessage(eliminationStatus)}
+          You are{" "}
+          {isLoading ? (
+            <strong>...</strong>
+          ) : (
+            getEliminationMessage(eliminationStatus)
+          )}
         </p>
         <p className={"mb-1"}>
           Question:{" "}
-          <strong className={"text-blue-900"}>{currQuestion?.question}</strong>
+          <strong className={"text-blue-900"}>
+            {isLoadingQuestion ? "..." : currQuestion?.question}
+          </strong>
         </p>
         <p className={"mb-1"}>
           Answer:{" "}
-          <strong className={"text-blue-900"}>{currQuestion?.answer}</strong>
+          <strong className={"text-blue-900"}>
+            {isLoadingQuestion ? "..." : currQuestion?.answer}
+          </strong>
         </p>
         <p className={"mb-1"}>
           Number of players survived:{" "}
-          <strong className={"text-purple-700"}>{survived}</strong>
+          <strong className={"text-purple-700"}>
+            {isLoading ? "..." : survived}
+          </strong>
         </p>
         <p className={"mb-6"}>
           Number of players eliminated:{" "}
-          <strong className={"text-red-500"}>{eliminated}</strong>
+          <strong className={"text-red-500"}>
+            {isLoading ? "..." : eliminated}
+          </strong>
         </p>
         {isHost && (
           <button
@@ -167,7 +201,7 @@ export default function ResultPage({ params }) {
               "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 mb-4"
             }
           >
-            Proceed
+            {processing ? <Spinner twW={"w-6"} twH={"h-6"} /> : "Proceed"}
           </button>
         )}
       </div>

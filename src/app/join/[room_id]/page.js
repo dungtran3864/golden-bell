@@ -16,6 +16,7 @@ import {
   USERS_PATH,
 } from "@/constants";
 import { doc } from "firebase/firestore";
+import Spinner from "@/component/Spinner";
 
 export default function JoinPage({ params }) {
   const roomId = params.room_id;
@@ -25,25 +26,35 @@ export default function JoinPage({ params }) {
   const [user, setUser] = useSessionStorage(USER_STORAGE_KEY);
   const [isHost, setHost] = useSessionStorage(HOST_STORAGE_KEY);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [processing, setProcessing] = useState(false);
 
   async function addUser(e) {
     e.preventDefault();
-    const isValidRoom = await validateRoom();
-    if (isValidRoom) {
-      const isHost = convertStringToBoolean(searchParams.get(HOST_STORAGE_KEY));
-      const userId = await addSingleDocument(USERS_PATH, {
-        name: name,
-        roomId: roomId,
-        answerSubmitted: false,
-        eliminated: false,
-        active: true,
-      });
-      setUser(userId);
-      setHost(isHost);
-      await makeTransaction((db, transaction) =>
-        incrementPlayerInGame(db, transaction, roomId)
-      );
-      router.push(`/lobby/${roomId}`);
+    setProcessing(true);
+    try {
+      const isValidRoom = await validateRoom();
+      if (isValidRoom) {
+        const isHost = convertStringToBoolean(
+          searchParams.get(HOST_STORAGE_KEY)
+        );
+        const userId = await addSingleDocument(USERS_PATH, {
+          name: name,
+          roomId: roomId,
+          answerSubmitted: false,
+          eliminated: false,
+          active: true,
+        });
+        setUser(userId);
+        setHost(isHost);
+        await makeTransaction((db, transaction) =>
+          incrementPlayerInGame(db, transaction, roomId)
+        );
+        router.push(`/lobby/${roomId}`);
+      }
+    } catch (error) {
+      console.log("Failed to join the game", error);
+    } finally {
+      setProcessing(false);
     }
   }
 
@@ -91,10 +102,7 @@ export default function JoinPage({ params }) {
           className={"bg-yellow-200 shadow-md rounded px-8 pt-6 pb-8 mb-4"}
         >
           <div className={"mb-4"}>
-            <label
-              htmlFor={"fname"}
-              className={"block text-lg font-bold mb-2"}
-            >
+            <label htmlFor={"fname"} className={"block text-lg font-bold mb-2"}>
               Name
             </label>
             <input
@@ -115,7 +123,7 @@ export default function JoinPage({ params }) {
               "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 mb-4"
             }
           >
-            Join the game
+            {processing ? <Spinner twW={"w-6"} twH={"h-6"} /> : "Join the game"}
           </button>
           <p className={"text-red-500 font-bold"}>{errorMessage}</p>
         </form>

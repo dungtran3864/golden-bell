@@ -4,23 +4,33 @@ import { useRouter } from "next/navigation";
 import { GAMES_PATH, LOBBY_STATE, QUESTIONS_PATH } from "@/constants";
 import { shuffle } from "@/utils";
 import { addSingleDocument, getMultipleDocuments } from "@/firebase/utils";
+import { useState } from "react";
+import Spinner from "@/component/Spinner";
 
 export default function Home() {
+  const [processing, setProcessing] = useState(false);
   const router = useRouter();
 
   async function createNewGame() {
-    const [count, questions] = await getMultipleDocuments(QUESTIONS_PATH);
-    const shuffledQuestions = shuffle(questions);
-    const roomId = await addSingleDocument(GAMES_PATH, {
-      state: LOBBY_STATE,
-      currQuestion: null,
-      currQuestionIdx: -1,
-      questions: shuffledQuestions,
-      numberOfPlayers: 0,
-      numberOfSubmitted: 0,
-      numberOfEliminated: 0,
-    });
-    router.push(`/join/${roomId}?isHost=true`);
+    setProcessing(true);
+    try {
+      const [count, questions] = await getMultipleDocuments(QUESTIONS_PATH);
+      const shuffledQuestions = shuffle(questions);
+      const roomId = await addSingleDocument(GAMES_PATH, {
+        state: LOBBY_STATE,
+        currQuestion: null,
+        currQuestionIdx: -1,
+        questions: shuffledQuestions,
+        numberOfPlayers: 0,
+        numberOfSubmitted: 0,
+        numberOfEliminated: 0,
+      });
+      router.push(`/join/${roomId}?isHost=true`);
+    } catch (error) {
+      console.log("Failed to create a game", error);
+    } finally {
+      setProcessing(false);
+    }
   }
 
   function joinGame() {
@@ -53,10 +63,14 @@ export default function Home() {
           type={"button"}
           onClick={createNewGame}
         >
-          Create a new game
+          {processing ? <Spinner twW={"w-6"} twH={"h-6"} /> : "Create a game"}
         </button>
       </div>
-      <img src={"golden-bell-clipart-design-illustration-free-png.webp"} alt={"golden bell image"} className={"object-scale-down h-48 w-96 mt-24"} />
+      <img
+        src={"golden-bell-clipart-design-illustration-free-png.webp"}
+        alt={"golden bell image"}
+        className={"object-scale-down h-48 w-96 mt-24"}
+      />
     </div>
   );
 }

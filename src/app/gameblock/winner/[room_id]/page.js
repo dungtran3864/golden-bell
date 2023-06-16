@@ -12,6 +12,7 @@ import { validateUser } from "@/utils/validation";
 import { useRouter } from "next/navigation";
 import { doc, where, writeBatch } from "firebase/firestore";
 import firebaseDB from "@/firebase/initFirebase";
+import Spinner from "@/component/Spinner";
 
 export default function WinnerPage({ params }) {
   const roomId = params.room_id;
@@ -19,6 +20,7 @@ export default function WinnerPage({ params }) {
   const [count, setCount] = useState(null);
   const [user] = useSessionStorage(USER_STORAGE_KEY);
   const [isHost] = useSessionStorage(HOST_STORAGE_KEY);
+  const [processing, setProcessing] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -160,21 +162,28 @@ export default function WinnerPage({ params }) {
 
   async function cleanUpGame() {
     if (isHost) {
-      const [usersCount, users] = await getMultipleDocuments(
-        USERS_PATH,
-        where("roomId", "==", roomId)
-      );
-      const gameData = await getSingleDocument(GAMES_PATH, roomId);
-      const batch = writeBatch(firebaseDB);
-      users.forEach((user) => {
-        const userRef = doc(firebaseDB, USERS_PATH, user.uid);
-        batch.delete(userRef);
-      });
-      if (gameData) {
-        const gameRef = doc(firebaseDB, GAMES_PATH, roomId);
-        batch.delete(gameRef);
+      setProcessing(true);
+      try {
+        const [usersCount, users] = await getMultipleDocuments(
+          USERS_PATH,
+          where("roomId", "==", roomId)
+        );
+        const gameData = await getSingleDocument(GAMES_PATH, roomId);
+        const batch = writeBatch(firebaseDB);
+        users.forEach((user) => {
+          const userRef = doc(firebaseDB, USERS_PATH, user.uid);
+          batch.delete(userRef);
+        });
+        if (gameData) {
+          const gameRef = doc(firebaseDB, GAMES_PATH, roomId);
+          batch.delete(gameRef);
+        }
+        await batch.commit();
+      } catch (error) {
+        console.log("Failed to clean up the game", error);
+      } finally {
+        setProcessing(false);
       }
-      await batch.commit();
     }
     router.push("/");
   }
@@ -191,7 +200,7 @@ export default function WinnerPage({ params }) {
             "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2 mb-4"
           }
         >
-          Exit game
+          {processing ? <Spinner twW={"w-6"} twH={"h-6"} /> : "Exit game"}
         </button>
       </div>
     </div>
