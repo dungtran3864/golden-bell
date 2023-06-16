@@ -7,6 +7,7 @@ import listenerGameState from "@/listener/listenerGameState";
 import { updateSingleDocument } from "@/firebase/utils";
 import { validateUser } from "@/utils/validation";
 import listenerParticipation from "@/listener/listenerParticipation";
+import Spinner from "@/component/Spinner";
 
 export default function LobbyPage({ params }) {
   const roomId = params.room_id;
@@ -16,6 +17,7 @@ export default function LobbyPage({ params }) {
   const [participants, setParticipants] = useState(0);
   const [gameState, setGameState] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     validateUser(roomId, user, router);
@@ -39,16 +41,23 @@ export default function LobbyPage({ params }) {
 
   async function startGame(e) {
     e.preventDefault();
-    if (participants > 1) {
-      await updateSingleDocument(GAMES_PATH, roomId, {
-        state: GAMEBLOCK_STATE,
-        numberOfPlayers: participants,
-      });
-      router.push(`/gameblock/${roomId}`);
-    } else {
-      setErrorMessage(
-        "The game needs to have at least 2 players. Please invite more people to join."
-      );
+    setProcessing(true);
+    try {
+      if (participants > 1) {
+        await updateSingleDocument(GAMES_PATH, roomId, {
+          state: GAMEBLOCK_STATE,
+          numberOfPlayers: participants,
+        });
+        router.push(`/gameblock/${roomId}`);
+      } else {
+        setErrorMessage(
+          "The game needs to have at least 2 players. Please invite more people to join."
+        );
+      }
+    } catch (error) {
+      console.log("Failed to start the game", error);
+    } finally {
+      setProcessing(false);
     }
   }
 
@@ -85,7 +94,7 @@ export default function LobbyPage({ params }) {
               "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-2"
             }
           >
-            Start game
+            {processing ? <Spinner twW={"w-6"} twH={"h-6"} /> : "Start game"}
           </button>
         )}
       </div>
