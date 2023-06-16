@@ -64,7 +64,7 @@ export default function Home() {
           onClick={createNewGame}
           disabled={processing}
         >
-          {processing ? <Spinner twW={"w-6"} twH={"h-6"} /> : "Create a game"}
+          {processing ? <Spinner /> : "Create a game"}
         </button>
       </div>
       <img

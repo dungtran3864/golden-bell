@@ -212,7 +212,7 @@ export default function WinnerPage({ params }) {
           }
           disabled={processing}
         >
-          {processing ? <Spinner twW={"w-6"} twH={"h-6"} /> : "Exit game"}
+          {processing ? <Spinner /> : "Exit game"}
         </button>
       </div>
     </div>

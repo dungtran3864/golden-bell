@@ -124,7 +124,7 @@ export default function JoinPage({ params }) {
             }
             disabled={processing}
           >
-            {processing ? <Spinner twW={"w-6"} twH={"h-6"} /> : "Join the game"}
+            {processing ? <Spinner /> : "Join the game"}
           </button>
           <p className={"text-red-500 font-bold"}>{errorMessage}</p>
         </form>
