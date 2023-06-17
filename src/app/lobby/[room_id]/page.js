@@ -41,22 +41,22 @@ export default function LobbyPage({ params }) {
 
   async function startGame(e) {
     e.preventDefault();
-    setProcessing(true);
-    try {
-      if (participants > 1) {
+    if (participants > 1) {
+      setProcessing(true);
+      try {
         await updateSingleDocument(GAMES_PATH, roomId, {
           state: GAMEBLOCK_STATE,
           numberOfPlayers: participants,
         });
         router.push(`/gameblock/${roomId}`);
-      } else {
-        setErrorMessage(
-          "The game needs to have at least 2 players. Please invite more people to join."
-        );
+      } catch (error) {
+        console.log("Failed to start the game", error);
+        setProcessing(false);
       }
-    } catch (error) {
-      console.log("Failed to start the game", error);
-      setProcessing(false);
+    } else {
+      setErrorMessage(
+        "The game needs to have at least 2 players. Please invite more people to join."
+      );
     }
   }
 

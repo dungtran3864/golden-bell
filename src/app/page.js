@@ -6,6 +6,7 @@ import { shuffle } from "@/utils";
 import { addSingleDocument, getMultipleDocuments } from "@/firebase/utils";
 import { useState } from "react";
 import Spinner from "@/component/Spinner";
+import Link from "next/link";
 
 export default function Home() {
   const [processing, setProcessing] = useState(false);
@@ -32,10 +33,6 @@ export default function Home() {
     }
   }
 
-  function joinGame() {
-    router.push("/join");
-  }
-
   return (
     <div className={"flex flex-col md:items-center"}>
       <h1
@@ -46,15 +43,14 @@ export default function Home() {
         Welcome to Golden Bell
       </h1>
       <div className={"flex flex-row"}>
-        <button
+        <Link
           className={
             "bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mr-2"
           }
-          type={"button"}
-          onClick={joinGame}
+          href={"/join"}
         >
           Join a game
-        </button>
+        </Link>
         <button
           className={
             "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
