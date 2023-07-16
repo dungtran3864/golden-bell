@@ -16,7 +16,13 @@ export default function Home() {
     setProcessing(true);
     try {
       const [count, questions] = await getMultipleDocuments(QUESTIONS_PATH);
-      const shuffledQuestions = shuffle(questions);
+      const questionsWithAnswersList = questions.map((question) => {
+        return {
+          ...question,
+          answersList: shuffle([question.answer, ...question.incorrectAnswers]),
+        };
+      });
+      const shuffledQuestions = shuffle(questionsWithAnswersList);
       const roomId = await addSingleDocument(GAMES_PATH, {
         state: LOBBY_STATE,
         currQuestion: null,

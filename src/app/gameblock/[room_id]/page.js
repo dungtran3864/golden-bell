@@ -17,7 +17,6 @@ export default function Gameblock({ params }) {
   const [currQuestion, resetRound, isQuestionRunOut, isLoadingQuestion] =
     useQuestion(roomId);
   const [user] = useSessionStorage("user");
-  const [answer, setAnswer] = useState(null);
   const [timer, setTimer] = useState(15);
   const router = useRouter();
 
@@ -100,7 +99,7 @@ export default function Gameblock({ params }) {
     e.preventDefault();
     clearInterval(countdownTracker);
     router.push(`/gameblock/wait/${roomId}`);
-    const isCorrect = checkAnswer(answer, currQuestion.answer);
+    const isCorrect = checkAnswer(e.target.value, currQuestion.answer);
     await updateSingleDocument(USERS_PATH, user, {
       answerSubmitted: true,
       eliminated: !isCorrect,
@@ -118,10 +117,7 @@ export default function Gameblock({ params }) {
     <div className={"flex justify-center mt-8"}>
       <div className={"flex-auto"} />
       <div className={"flex-auto w-6/12"}>
-        <form
-          onSubmit={submitAnswer}
-          className={"bg-yellow-200 shadow-md rounded px-8 pt-6 pb-8 mb-4"}
-        >
+        <div className={"bg-yellow-200 shadow-md rounded px-8 pt-6 pb-8 mb-4"}>
           <div className={"mb-4"}>
             <p className={"text-lg"}>
               Time left: <strong className={"text-red-500"}>{timer}</strong>{" "}
@@ -133,30 +129,26 @@ export default function Gameblock({ params }) {
                 {isLoadingQuestion ? "..." : currQuestion?.question}
               </strong>
             </p>
-            <label htmlFor="answer" className={"block text-lg font-bold mb-2"}>
-              Type in your answer:
-            </label>
-            <input
-              type="text"
-              id="answer"
-              name="answer"
-              autoComplete={"off"}
-              onChange={(e) => setAnswer(e.target.value)}
-              required
-              className={
-                "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              }
-            />
+            <span className={"block text-lg font-bold mb-2"}>
+              Choose an answer:
+            </span>
+            <div className={"flex flex-row"}>
+              {currQuestion?.answersList.map((answerItem, index) => (
+                <button
+                  key={index}
+                  type={"button"}
+                  value={answerItem}
+                  className={
+                    "bg-blue-500 hover:bg-blue-700 text-white font-bold w-32 rounded py-2 mr-2 flex-auto"
+                  }
+                  onClick={submitAnswer}
+                >
+                  {answerItem}
+                </button>
+              ))}
+            </div>
           </div>
-          <button
-            type={"submit"}
-            className={
-              "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
-            }
-          >
-            Submit
-          </button>
-        </form>
+        </div>
       </div>
       <div className={"flex-auto"} />
     </div>
