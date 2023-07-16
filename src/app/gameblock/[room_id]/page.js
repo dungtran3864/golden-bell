@@ -132,14 +132,14 @@ export default function Gameblock({ params }) {
             <span className={"block text-lg font-bold mb-2"}>
               Choose an answer:
             </span>
-            <div className={"flex flex-row"}>
+            <div className={"grid grid-rows-2 grid-flow-col gap-2"}>
               {currQuestion?.answersList.map((answerItem, index) => (
                 <button
                   key={index}
                   type={"button"}
                   value={answerItem}
                   className={
-                    "bg-blue-500 hover:bg-blue-700 text-white font-bold w-32 rounded py-2 mr-2 flex-auto"
+                    "bg-purple-500 hover:bg-purple-700 text-white font-bold rounded py-2 flex-auto"
                   }
                   onClick={submitAnswer}
                 >
