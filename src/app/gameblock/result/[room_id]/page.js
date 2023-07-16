@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { validateUser } from "@/utils/validation";
 import useSessionStorage from "@/hooks/useSessionStorage";
@@ -20,6 +21,7 @@ import {
 import listenerGameState from "@/listener/listenerGameState";
 import { where } from "firebase/firestore";
 import Spinner from "@/component/Spinner";
+import {decode} from "html-entities";
 
 export default function ResultPage({ params }) {
   const roomId = params.room_id;
@@ -171,13 +173,13 @@ export default function ResultPage({ params }) {
         <p className={"mb-1"}>
           Question:{" "}
           <strong className={"text-blue-900"}>
-            {isLoadingQuestion ? "..." : currQuestion?.question}
+            {isLoadingQuestion ? "..." : decode(currQuestion?.question)}
           </strong>
         </p>
         <p className={"mb-1"}>
           Answer:{" "}
           <strong className={"text-blue-900"}>
-            {isLoadingQuestion ? "..." : currQuestion?.answer}
+            {isLoadingQuestion ? "..." : decode(currQuestion?.answer)}
           </strong>
         </p>
         <p className={"mb-1"}>

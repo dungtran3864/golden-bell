@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { GAMES_PATH, RESULT_STATE, USERS_PATH } from "@/constants";
 import { makeTransaction, updateSingleDocument } from "@/firebase/utils";
 import { validateUser } from "@/utils/validation";
+import { decode } from "html-entities";
 
 let countdown;
 let countdownTracker;
@@ -126,7 +127,7 @@ export default function Gameblock({ params }) {
             <p className={"mb-2 text-lg"}>
               Question:{" "}
               <strong className={"text-blue-900"}>
-                {isLoadingQuestion ? "..." : currQuestion?.question}
+                {isLoadingQuestion ? "..." : decode(currQuestion?.question)}
               </strong>
             </p>
             <span className={"block text-lg font-bold mb-2"}>
@@ -143,7 +144,7 @@ export default function Gameblock({ params }) {
                   }
                   onClick={submitAnswer}
                 >
-                  {answerItem}
+                  {decode(answerItem)}
                 </button>
               ))}
             </div>

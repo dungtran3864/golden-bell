@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { GAMES_PATH, LOBBY_STATE, QUESTIONS_PATH } from "@/constants";
-import { shuffle } from "@/utils";
-import { addSingleDocument, getMultipleDocuments } from "@/firebase/utils";
+import { GAMES_PATH, LOBBY_STATE } from "@/constants";
+import { getData, shuffle } from "@/utils";
+import { addSingleDocument } from "@/firebase/utils";
 import { useState } from "react";
 import Spinner from "@/component/Spinner";
 import Link from "next/link";
@@ -15,11 +15,17 @@ export default function Home() {
   async function createNewGame() {
     setProcessing(true);
     try {
-      const [count, questions] = await getMultipleDocuments(QUESTIONS_PATH);
-      const questionsWithAnswersList = questions.map((question) => {
+      const questionData = await getData(
+        "https://opentdb.com/api.php?amount=20&difficulty=easy&type=multiple"
+      );
+      const questionsWithAnswersList = questionData.results.map((questionItem) => {
         return {
-          ...question,
-          answersList: shuffle([question.answer, ...question.incorrectAnswers]),
+          question: questionItem.question,
+          answer: questionItem.correct_answer,
+          answersList: shuffle([
+            questionItem.correct_answer,
+            ...questionItem.incorrect_answers,
+          ]),
         };
       });
       const shuffledQuestions = shuffle(questionsWithAnswersList);
