@@ -61,7 +61,7 @@ export default function JoinPage({ params }) {
     const gameData = await getSingleDocument(GAMES_PATH, roomId);
     if (gameData) {
       if (gameData.state === LOBBY_STATE) {
-        if (gameData.numberOfPlayers < 25) {
+        if (gameData.numberOfPlayers < 100) {
           return true;
         } else {
           setErrorMessage(
